@@ -15,10 +15,24 @@
     ios-src="model.usdz"
     alt="3D Model"
     ar
-    ar-modes="webxr scene-viewer quick-look"
+    ar-modes="webxr quick-look" <!-- Use the updated line from Step 1 -->
     camera-controls
     auto-rotate
     shadow-intensity="1">
-  </model-viewer>
+    <!-- Custom AR Button -->
+    <button slot="ar-button" style="
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;">
+        👋 View in AR
+    </button>
+</model-viewer>
 </body>
 </html>
