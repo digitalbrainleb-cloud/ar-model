@@ -1,25 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>AR Model Viewer</title>
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <script type="module"
+    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
+  </script>
   <style>
-    body { margin: 0; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    model-viewer { width: 100%; height: 100%; max-width: 800px; max-height: 600px; }
+    body {
+      margin: 0;
+      background: #f1f1f1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    model-viewer {
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body>
-  <!-- GLB file is in same GitHub repo -->
-  <model-viewer
+
+  <model-viewer 
     src="model.glb"
-    ios-src="https://drive.google.com/uc?export=download&id=1eSL-Or61E9qfdVVPGLWKhTlyqAn_G1zB"
-    alt="3D Model"
+    alt="3D model"
     ar
     ar-modes="scene-viewer quick-look webxr"
     camera-controls
     auto-rotate
     shadow-intensity="1">
   </model-viewer>
+
 </body>
 </html>
