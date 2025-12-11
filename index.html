@@ -10,12 +10,13 @@
   </style>
 </head>
 <body>
+  <!-- Corrected model-viewer tag: Note the closing '>' after shadow-intensity -->
   <model-viewer
     src="model.glb"
     ios-src="model.usdz"
     alt="3D Model"
     ar
-    ar-modes="webxr quick-look" <!-- Use the updated line from Step 1 -->
+    ar-modes="webxr quick-look"
     camera-controls
     auto-rotate
     shadow-intensity="1">
@@ -33,6 +34,6 @@
         font-size: 16px;">
         👋 View in AR
     </button>
-</model-viewer>
+  </model-viewer> <!-- This is the closing tag for model-viewer -->
 </body>
 </html>
