@@ -10,7 +10,6 @@
   </style>
 </head>
 <body>
-  <!-- Corrected model-viewer tag: Note the closing '>' after shadow-intensity -->
   <model-viewer
     src="model.glb"
     alt="3D Model"
@@ -19,8 +18,10 @@
     camera-controls
     auto-rotate
     shadow-intensity="1"
-    <!-- ADD THESE TWO LINES -->
-    camera-orbit="0deg 75deg 105%"
+    <!-- KEY FIX: Scale the model down by 50% -->
+    scale="0.1 0.1 0.1"
+    <!-- Optional: Adjust the view to center the now-smaller model -->
+    camera-orbit="0deg 75deg 2.5m"
     field-of-view="30deg">
     <!-- Custom AR Button -->
     <button slot="ar-button" style="
@@ -36,6 +37,6 @@
         font-size: 16px;">
         👋 View in AR
     </button>
-  </model-viewer> <!-- This is the closing tag for model-viewer -->
+  </model-viewer>
 </body>
 </html>
