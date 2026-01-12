@@ -429,8 +429,8 @@
     // Common model patterns to check
     const COMMON_MODELS = [
       // Add your known model patterns here
-      { pattern: 'shaker', name: 'Shaker' },
-      { pattern: 'christmas-frame', name: 'Christmas Frame' },
+      { pattern: 'model-shaker', name: 'Shaker' },
+      { pattern: 'model-christmas-frame', name: 'Christmas Frame' },
       { pattern: 'model', name: 'Main Model' },
       // Add more patterns as needed
     ];
@@ -489,7 +489,8 @@
         // Try some default files
         const defaultChecks = [
           { glb: 'model.glb', usdz: 'model.usdz', name: 'Default Model' },
-          { glb: 'shaker.glb', usdz: 'shaker.usdz', name: 'Shaker' }
+          { glb: 'model-shaker.glb', usdz: 'model-shaker.usdz', name: 'Shaker' }
+          { glb: 'model-christmas-frame.glb', usdz: 'model-christmas-frame.usdz', name: 'Christmas Frame' }
         ];
         
         for (const check of defaultChecks) {
