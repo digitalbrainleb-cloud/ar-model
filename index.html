@@ -5,34 +5,384 @@
   <title>AR Model Viewer</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
-    body { margin: 0; }
-    model-viewer { width: 100vw; height: 100vh; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    .model-viewer-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    
+    model-viewer {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .model-selector {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 300px;
+      z-index: 10;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .model-selector h3 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 18px;
+    }
+    
+    .model-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .model-option {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    .model-option:hover {
+      border-color: #4285f4;
+      background: #f8f9fa;
+    }
+    
+    .model-option.selected {
+      border-color: #4285f4;
+      background: #e8f0fe;
+    }
+    
+    .model-option input {
+      margin-right: 12px;
+      accent-color: #4285f4;
+    }
+    
+    .model-info {
+      flex-grow: 1;
+    }
+    
+    .model-name {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .model-files {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .ar-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #4285f4, #34a853);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      z-index: 10;
+    }
+    
+    .ar-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
+    }
+    
+    .no-models {
+      color: #666;
+      text-align: center;
+      padding: 20px;
+      font-style: italic;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .model-selector {
+        max-width: calc(100% - 40px);
+        left: 20px;
+        right: 20px;
+      }
+      
+      .ar-button {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+    }
+    
+    /* Loading state */
+    .loading {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px 30px;
+      border-radius: 8px;
+      z-index: 20;
+    }
+    
+    .loading.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
-  <!-- Corrected model-viewer tag: Note the closing '>' after shadow-intensity -->
-  <model-viewer
-    src="model.glb"
-    alt="3D Model"
-    ar
-    ar-modes="webxr quick-look"
-    camera-controls
-    auto-rotate
-    shadow-intensity="1">
-    <!-- Custom AR Button -->
-    <button slot="ar-button" style="
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        padding: 10px 20px;
-        background-color: #4285f4;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;">
-        👋 View in AR
+  <div class="model-viewer-container">
+    <!-- Model viewer -->
+    <model-viewer
+      id="ar-viewer"
+      alt="3D Model"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      camera-controls
+      auto-rotate
+      shadow-intensity="1">
+      
+      <!-- AR Button will be moved programmatically -->
+    </model-viewer>
+    
+    <!-- Model selector panel -->
+    <div class="model-selector">
+      <h3>🎯 Select a Model</h3>
+      <div id="model-list" class="model-list">
+        <!-- Models will be loaded here dynamically -->
+        <div class="loading-message">Loading models...</div>
+      </div>
+    </div>
+    
+    <!-- AR Button -->
+    <button id="ar-button" class="ar-button" style="display: none;">
+      👋 View in AR
     </button>
-  </model-viewer> <!-- This is the closing tag for model-viewer -->
+    
+    <!-- Loading overlay -->
+    <div id="loading" class="loading">
+      Loading model...
+    </div>
+  </div>
+
+  <script>
+    // List of known model files (you can extend this list)
+    const knownModels = [
+      { 
+        name: 'Shaker',
+        glb: 'model-shaker.glb',
+        usdz: 'model-shaker.usdz',
+        thumbnail: 'model-shaker-thumb.jpg' // optional
+      },
+      { 
+        name: 'Christmas Frame',
+        glb: 'model-shaker-christmas-frame.glb',
+        usdz: 'model-christmas-frame.usdz',
+        thumbnail: 'model-christmas-thumb.jpg' // optional
+      }
+      // Add more models here as you create them
+    ];
+    
+    // Alternative: Auto-detect models from a list of possible filenames
+    // This approach doesn't require server-side file listing
+    const possibleModels = [
+      'shaker',
+      'shaker-christmas-frame',
+      'shaker-valentine', // example
+      'shaker-halloween', // example
+      // Add more model names here
+    ];
+    
+    // Function to check if a file exists
+    async function checkFileExists(url) {
+      try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok;
+      } catch (error) {
+        return false;
+      }
+    }
+    
+    // Function to auto-discover available models
+    async function discoverModels() {
+      const availableModels = [];
+      
+      // Check each possible model
+      for (const modelName of possibleModels) {
+        const glbFile = `model-${modelName}.glb`;
+        const usdzFile = modelName.includes('christmas') 
+          ? `model-christmas-frame.usdz`
+          : `model-${modelName}.usdz`;
+        
+        const glbExists = await checkFileExists(glbFile);
+        
+        if (glbExists) {
+          availableModels.push({
+            name: formatModelName(modelName),
+            glb: glbFile,
+            usdz: usdzFile,
+            id: modelName
+          });
+        }
+      }
+      
+      // Also check known models as backup
+      for (const model of knownModels) {
+        const glbExists = await checkFileExists(model.glb);
+        if (glbExists && !availableModels.some(m => m.glb === model.glb)) {
+          availableModels.push(model);
+        }
+      }
+      
+      return availableModels;
+    }
+    
+    // Format model name for display
+    function formatModelName(name) {
+      return name
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+    
+    // Function to render model list
+    function renderModelList(models) {
+      const modelList = document.getElementById('model-list');
+      
+      if (models.length === 0) {
+        modelList.innerHTML = '<div class="no-models">No models found. Please add model files to the repository.</div>';
+        return;
+      }
+      
+      modelList.innerHTML = models.map((model, index) => `
+        <div class="model-option ${index === 0 ? 'selected' : ''}" data-model='${JSON.stringify(model)}'>
+          <input type="radio" name="model-select" ${index === 0 ? 'checked' : ''} id="model-${index}">
+          <label for="model-${index}" class="model-info">
+            <div class="model-name">${model.name}</div>
+            <div class="model-files">Files: ${model.glb}, ${model.usdz}</div>
+          </label>
+        </div>
+      `).join('');
+      
+      // Add click handlers
+      document.querySelectorAll('.model-option').forEach(option => {
+        option.addEventListener('click', function() {
+          // Update selection UI
+          document.querySelectorAll('.model-option').forEach(opt => {
+            opt.classList.remove('selected');
+            opt.querySelector('input').checked = false;
+          });
+          
+          this.classList.add('selected');
+          this.querySelector('input').checked = true;
+          
+          // Load the selected model
+          const model = JSON.parse(this.dataset.model);
+          loadModel(model);
+        });
+      });
+      
+      // Load the first model by default
+      if (models.length > 0) {
+        loadModel(models[0]);
+      }
+    }
+    
+    // Function to load a model into the viewer
+    function loadModel(model) {
+      const viewer = document.getElementById('ar-viewer');
+      const loading = document.getElementById('loading');
+      const arButton = document.getElementById('ar-button');
+      
+      // Show loading
+      loading.classList.add('active');
+      
+      // Set the model sources
+      viewer.src = model.glb;
+      viewer.iOSsrc = model.usdz; // For Quick Look on iOS
+      
+      // Update AR button to show model name
+      arButton.textContent = `👋 View ${model.name} in AR`;
+      arButton.style.display = 'block';
+      
+      // Wait for model to load
+      viewer.addEventListener('load', () => {
+        loading.classList.remove('active');
+        
+        // Move AR button to model-viewer slot
+        viewer.appendChild(arButton);
+        
+        console.log(`Model loaded: ${model.name}`);
+      }, { once: true });
+      
+      // Handle errors
+      viewer.addEventListener('error', (error) => {
+        loading.classList.remove('active');
+        console.error('Error loading model:', error);
+        alert(`Failed to load model: ${model.name}. Please check if the file exists.`);
+      });
+    }
+    
+    // Function to setup AR button
+    function setupARButton() {
+      const arButton = document.getElementById('ar-button');
+      const viewer = document.getElementById('ar-viewer');
+      
+      // Set AR button slot
+      arButton.setAttribute('slot', 'ar-button');
+    }
+    
+    // Initialize the application
+    async function init() {
+      console.log('Initializing AR Model Viewer...');
+      
+      // Setup AR button
+      setupARButton();
+      
+      // Try to discover models
+      try {
+        const models = await discoverModels();
+        console.log('Found models:', models);
+        renderModelList(models);
+      } catch (error) {
+        console.error('Error discovering models:', error);
+        
+        // Fallback to known models
+        const fallbackModels = knownModels.filter(model => {
+          // You might want to check if files exist here too
+          return true;
+        });
+        
+        renderModelList(fallbackModels);
+      }
+    }
+    
+    // Start the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', init);
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      // You can add responsive adjustments here
+    });
+  </script>
 </body>
 </html>
