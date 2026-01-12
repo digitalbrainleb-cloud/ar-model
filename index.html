@@ -14,7 +14,7 @@
     
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #f5f5f5;
       min-height: 100vh;
       padding: 20px;
     }
@@ -26,7 +26,6 @@
     
     header {
       text-align: center;
-      color: white;
       margin-bottom: 40px;
       padding: 20px;
     }
@@ -34,20 +33,19 @@
     h1 {
       font-size: 2.5rem;
       margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      color: #333;
     }
     
     .subtitle {
       font-size: 1.2rem;
-      opacity: 0.9;
+      color: #666;
     }
     
     /* Models Grid */
     .models-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
-      margin-bottom: 40px;
     }
     
     @media (max-width: 768px) {
@@ -58,9 +56,9 @@
     
     .model-card {
       background: white;
-      border-radius: 15px;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       transition: transform 0.3s ease;
     }
     
@@ -69,92 +67,46 @@
     }
     
     .model-thumbnail {
-      height: 200px;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      height: 150px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
     }
     
     .thumbnail-icon {
-      font-size: 80px;
-      opacity: 0.7;
-      color: #667eea;
-    }
-    
-    .thumbnail-placeholder {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
-      background-size: 200% 200%;
-      animation: shimmer 2s infinite;
-    }
-    
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+      font-size: 60px;
+      color: white;
+      opacity: 0.9;
     }
     
     .model-info {
       padding: 20px;
     }
     
-    .model-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-    }
-    
     .model-name {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       font-weight: bold;
       color: #333;
-    }
-    
-    .model-files {
-      display: flex;
-      gap: 8px;
       margin-bottom: 15px;
-    }
-    
-    .file-badge {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
-    
-    .file-badge.glb {
-      background: #e3f2fd;
-      color: #1976d2;
-    }
-    
-    .file-badge.usdz {
-      background: #e8f5e9;
-      color: #388e3c;
+      text-align: center;
     }
     
     .ar-button {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      padding: 12px 0;
+      padding: 15px;
       width: 100%;
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
     }
     
     .ar-button:hover {
@@ -162,73 +114,28 @@
       box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
     
-    /* Hidden AR Viewer */
-    .ar-viewer-overlay {
+    /* Hidden AR Viewers (one for each model) */
+    .ar-viewer {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: white;
       z-index: 1000;
       display: none;
     }
     
-    .ar-viewer-header {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      right: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 1001;
-    }
-    
-    .back-button {
-      background: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .current-model {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #333;
-      background: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    /* AR Viewer Fullscreen */
-    #ar-viewer {
+    model-viewer {
       width: 100%;
       height: 100%;
-    }
-    
-    /* Footer */
-    footer {
-      text-align: center;
-      color: white;
-      padding: 20px;
-      opacity: 0.8;
-      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>🎮 AR Models Gallery</h1>
-      <p class="subtitle">Select a model to view in Augmented Reality</p>
+      <h1>📱 AR Models</h1>
+      <p class="subtitle">Click any button to open AR camera directly</p>
     </header>
     
     <!-- Models Grid -->
@@ -237,18 +144,10 @@
       <div class="model-card">
         <div class="model-thumbnail">
           <div class="thumbnail-icon">🧊</div>
-          <div class="thumbnail-placeholder"></div>
         </div>
         <div class="model-info">
-          <div class="model-row">
-            <div class="model-name">Main Model</div>
-            <div class="model-badge">3D</div>
-          </div>
-          <div class="model-files">
-            <span class="file-badge glb">GLB</span>
-            <span class="file-badge usdz">USDZ</span>
-          </div>
-          <button class="ar-button" onclick="openAR('Main Model', 'model.glb', 'model.usdz')">
+          <div class="model-name">Main Model</div>
+          <button class="ar-button" onclick="openARCamera('model.glb', 'model.usdz')">
             <span>👋</span> View in AR
           </button>
         </div>
@@ -258,18 +157,10 @@
       <div class="model-card">
         <div class="model-thumbnail">
           <div class="thumbnail-icon">🎁</div>
-          <div class="thumbnail-placeholder"></div>
         </div>
         <div class="model-info">
-          <div class="model-row">
-            <div class="model-name">Shaker</div>
-            <div class="model-badge">3D</div>
-          </div>
-          <div class="model-files">
-            <span class="file-badge glb">GLB</span>
-            <span class="file-badge usdz">USDZ</span>
-          </div>
-          <button class="ar-button" onclick="openAR('Shaker', 'model-shaker.glb', 'model-shaker.usdz')">
+          <div class="model-name">Shaker</div>
+          <button class="ar-button" onclick="openARCamera('model-shaker.glb', 'model-shaker.usdz')">
             <span>👋</span> View in AR
           </button>
         </div>
@@ -279,120 +170,98 @@
       <div class="model-card">
         <div class="model-thumbnail">
           <div class="thumbnail-icon">🎄</div>
-          <div class="thumbnail-placeholder"></div>
         </div>
         <div class="model-info">
-          <div class="model-row">
-            <div class="model-name">Christmas Frame</div>
-            <div class="model-badge">3D</div>
-          </div>
-          <div class="model-files">
-            <span class="file-badge glb">GLB</span>
-            <span class="file-badge usdz">USDZ</span>
-          </div>
-          <button class="ar-button" onclick="openAR('Christmas Frame', 'model-christmas-frame.glb', 'model-christmas-frame.usdz')">
+          <div class="model-name">Christmas Frame</div>
+          <button class="ar-button" onclick="openARCamera('model-christmas-frame.glb', 'model-christmas-frame.usdz')">
             <span>👋</span> View in AR
           </button>
         </div>
       </div>
     </div>
-    
-    <footer>
-      <p>AR Model Viewer | Compatible with iOS Quick Look and Android WebXR</p>
-    </footer>
   </div>
 
-  <!-- Hidden AR Viewer -->
-  <div class="ar-viewer-overlay" id="ar-overlay">
-    <div class="ar-viewer-header">
-      <button class="back-button" onclick="closeAR()">
-        <span>←</span> Back to Gallery
-      </button>
-      <div class="current-model" id="current-model-name"></div>
-    </div>
-    
-    <model-viewer
-      id="ar-viewer"
-      alt="3D Model"
-      ar
-      ar-modes="webxr quick-look"
-      camera-controls
-      auto-rotate
-      shadow-intensity="1">
-      
-      <!-- AR Button will be added by model-viewer -->
-    </model-viewer>
-  </div>
+  <!-- Hidden AR Viewer Container -->
+  <div id="ar-container" style="display: none;"></div>
 
   <script>
-    function openAR(modelName, glbFile, usdzFile) {
-      console.log('Opening AR for:', modelName, glbFile, usdzFile);
+    // Function to open AR camera directly
+    function openARCamera(glbFile, usdzFile) {
+      console.log('Opening AR camera for:', glbFile);
       
-      // Set current model name
-      document.getElementById('current-model-name').textContent = modelName;
+      // Remove any existing AR viewer
+      const container = document.getElementById('ar-container');
+      container.innerHTML = '';
       
-      // Get the AR viewer
-      const viewer = document.getElementById('ar-viewer');
-      const overlay = document.getElementById('ar-overlay');
+      // Create the model-viewer element
+      const viewer = document.createElement('model-viewer');
       
-      // Set model sources
+      // Configure the viewer
       viewer.src = glbFile;
       viewer.iOSsrc = usdzFile;
-      viewer.alt = modelName;
+      viewer.alt = "3D Model";
+      viewer.ar = true;
+      viewer.arModes = "webxr quick-look";
+      viewer.cameraControls = true;
+      viewer.autoRotate = true;
+      viewer.shadowIntensity = 1;
       
-      // Show AR viewer
-      overlay.style.display = 'block';
+      // Make it fullscreen
+      viewer.style.width = '100vw';
+      viewer.style.height = '100vh';
       
-      // Hide body scroll
-      document.body.style.overflow = 'hidden';
+      // Add to container
+      container.appendChild(viewer);
       
-      // Create AR button
-      const arButton = document.createElement('button');
-      arButton.setAttribute('slot', 'ar-button');
-      arButton.style.cssText = `
-        position: absolute;
-        top: 80px;
-        right: 20px;
+      // Show the container
+      container.style.display = 'block';
+      
+      // Trigger AR mode after a short delay to ensure the viewer is ready
+      setTimeout(() => {
+        if (viewer.activateAR) {
+          viewer.activateAR();
+        }
+      }, 500);
+      
+      // Listen for AR session end to go back to gallery
+      viewer.addEventListener('ar-status', (event) => {
+        if (event.detail.status === 'not-presenting') {
+          container.style.display = 'none';
+          container.innerHTML = '';
+        }
+      });
+      
+      // Add back button
+      const backButton = document.createElement('button');
+      backButton.innerHTML = '← Back';
+      backButton.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 20px;
         padding: 12px 24px;
-        background-color: #4285f4;
-        color: white;
+        background: white;
+        color: #333;
         border: none;
         border-radius: 8px;
-        cursor: pointer;
         font-size: 16px;
         font-weight: bold;
+        cursor: pointer;
+        z-index: 1001;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       `;
-      arButton.textContent = `👋 View ${modelName} in AR`;
       
-      // Add AR button to viewer
-      viewer.appendChild(arButton);
+      backButton.onclick = function() {
+        container.style.display = 'none';
+        container.innerHTML = '';
+      };
+      
+      document.body.appendChild(backButton);
+      
+      // Remove back button when AR session ends
+      viewer.addEventListener('ar-status', () => {
+        backButton.remove();
+      });
     }
-    
-    function closeAR() {
-      const overlay = document.getElementById('ar-overlay');
-      const viewer = document.getElementById('ar-viewer');
-      
-      // Hide AR viewer
-      overlay.style.display = 'none';
-      
-      // Show body scroll
-      document.body.style.overflow = 'auto';
-      
-      // Clear viewer
-      viewer.src = '';
-      viewer.iOSsrc = '';
-      
-      // Remove all AR buttons
-      const buttons = viewer.querySelectorAll('button[slot="ar-button"]');
-      buttons.forEach(button => button.remove());
-    }
-    
-    // Close AR viewer with Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeAR();
-      }
-    });
   </script>
 </body>
 </html>
