@@ -33,6 +33,11 @@
       z-index: 10;
       max-height: 80vh;
       overflow-y: auto;
+      display: none; /* Hidden by default, shown after loading */
+    }
+    
+    .model-selector.show {
+      display: block;
     }
     
     .model-selector h3 {
@@ -88,6 +93,20 @@
       color: #666;
     }
     
+    .toggle-selector {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 5;
+    }
+    
     .ar-button {
       position: absolute;
       top: 20px;
@@ -129,28 +148,100 @@
         padding: 10px 20px;
         font-size: 14px;
       }
+      
+      .toggle-selector {
+        top: 20px;
+        left: 20px;
+        padding: 8px 16px;
+      }
     }
     
     /* Loading state */
     .loading {
-      display: none;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 20px 30px;
-      border-radius: 8px;
-      z-index: 20;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      text-align: center;
+      min-width: 200px;
     }
     
-    .loading.active {
-      display: block;
+    .loading.hidden {
+      display: none;
+    }
+    
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4285f4;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    
+    .model-count {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      margin-top: 15px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: #34a853;
+      width: 0%;
+      transition: width 0.3s ease;
     }
   </style>
 </head>
 <body>
   <div class="model-viewer-container">
+    <!-- Loading overlay -->
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Scanning for 3D models...</div>
+      <div id="model-count" class="model-count"></div>
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+    </div>
+    
+    <!-- Toggle selector button -->
+    <button id="toggle-selector" class="toggle-selector">📁 Select Model</button>
+    
+    <!-- Model selector panel -->
+    <div id="model-selector" class="model-selector">
+      <h3>🎯 Available Models</h3>
+      <div id="model-list" class="model-list">
+        <!-- Models will be loaded here dynamically -->
+      </div>
+    </div>
+    
     <!-- Model viewer -->
     <model-viewer
       id="ar-viewer"
@@ -160,57 +251,60 @@
       camera-controls
       auto-rotate
       shadow-intensity="1">
-      
-      <!-- AR Button will be moved programmatically -->
     </model-viewer>
-    
-    <!-- Model selector panel -->
-    <div class="model-selector">
-      <h3>🎯 Select a Model</h3>
-      <div id="model-list" class="model-list">
-        <!-- Models will be loaded here dynamically -->
-        <div class="loading-message">Loading models...</div>
-      </div>
-    </div>
     
     <!-- AR Button -->
     <button id="ar-button" class="ar-button" style="display: none;">
       👋 View in AR
     </button>
-    
-    <!-- Loading overlay -->
-    <div id="loading" class="loading">
-      Loading model...
-    </div>
   </div>
 
   <script>
-    // List of known model files (you can extend this list)
-    const knownModels = [
-      { 
-        name: 'Shaker',
-        glb: 'model-shaker.glb',
-        usdz: 'model-shaker.usdz',
-        thumbnail: 'model-shaker-thumb.jpg' // optional
-      },
-      { 
-        name: 'Christmas Frame',
-        glb: 'model-shaker-christmas-frame.glb',
-        usdz: 'model-christmas-frame.usdz',
-        thumbnail: 'model-christmas-thumb.jpg' // optional
-      }
-      // Add more models here as you create them
-    ];
+    // Configuration
+    const CONFIG = {
+      // Common file patterns to check
+      patterns: [
+        '*.glb',
+        '*.GLB',
+        '*.usdz',
+        '*.USDZ',
+        'model-*.glb',
+        'model-*.usdz',
+        '*.model.glb',
+        '*.model.usdz'
+      ],
+      // Directories to check (relative paths)
+      directories: [
+        '.',
+        'models',
+        'assets',
+        'models/glb',
+        'models/usdz'
+      ]
+    };
     
-    // Alternative: Auto-detect models from a list of possible filenames
-    // This approach doesn't require server-side file listing
-    const possibleModels = [
-      'shaker',
-      'shaker-christmas-frame',
-      'shaker-valentine', // example
-      'shaker-halloween', // example
-      // Add more model names here
-    ];
+    // Store discovered models
+    let discoveredModels = [];
+    let currentModel = null;
+    
+    // Function to extract base name from filename
+    function extractBaseName(filename) {
+      // Remove extensions
+      let base = filename.replace(/\.(glb|usdz|GLB|USDZ)$/i, '');
+      
+      // Remove common prefixes
+      base = base.replace(/^(model[-_])/i, '');
+      
+      // Remove common suffixes
+      base = base.replace(/[-_]model$/i, '');
+      
+      // Convert to display name
+      return base
+        .split(/[-_]/)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ')
+        .trim();
+    }
     
     // Function to check if a file exists
     async function checkFileExists(url) {
@@ -222,46 +316,154 @@
       }
     }
     
-    // Function to auto-discover available models
-    async function discoverModels() {
-      const availableModels = [];
+    // Function to discover all model files
+    async function discoverAllModels() {
+      const modelsMap = new Map(); // Use Map to avoid duplicates
+      let checkedCount = 0;
+      const totalChecks = CONFIG.patterns.length * CONFIG.directories.length;
       
-      // Check each possible model
-      for (const modelName of possibleModels) {
-        const glbFile = `model-${modelName}.glb`;
-        const usdzFile = modelName.includes('christmas') 
-          ? `model-christmas-frame.usdz`
-          : `model-${modelName}.usdz`;
-        
-        const glbExists = await checkFileExists(glbFile);
-        
-        if (glbExists) {
-          availableModels.push({
-            name: formatModelName(modelName),
-            glb: glbFile,
-            usdz: usdzFile,
-            id: modelName
-          });
+      // Update progress
+      updateProgress(0, totalChecks);
+      
+      // Check each directory and pattern
+      for (const directory of CONFIG.directories) {
+        for (const pattern of CONFIG.patterns) {
+          // Create a test filename pattern
+          const testFile = pattern.replace('*', 'test');
+          
+          // For GLB files
+          if (pattern.includes('.glb')) {
+            const files = await findFilesByExtension(directory, '.glb');
+            for (const file of files) {
+              const glbUrl = directory === '.' ? file : `${directory}/${file}`;
+              const baseName = file.replace(/\.glb$/i, '');
+              
+              // Check for corresponding USDZ file
+              const possibleUsdzNames = [
+                file.replace(/\.glb$/i, '.usdz'),
+                file.replace(/\.glb$/i, '.USDZ'),
+                baseName.replace(/model[-_]/i, '') + '.usdz',
+                'model-' + baseName.replace(/model[-_]/i, '') + '.usdz'
+              ];
+              
+              let usdzUrl = null;
+              for (const usdzName of possibleUsdzNames) {
+                const testUsdzUrl = directory === '.' ? usdzName : `${directory}/${usdzName}`;
+                if (await checkFileExists(testUsdzUrl)) {
+                  usdzUrl = testUsdzUrl;
+                  break;
+                }
+              }
+              
+              // Add to models map
+              const modelKey = baseName.toLowerCase();
+              if (!modelsMap.has(modelKey)) {
+                modelsMap.set(modelKey, {
+                  name: extractBaseName(file),
+                  glb: glbUrl,
+                  usdz: usdzUrl,
+                  baseName: baseName
+                });
+              }
+            }
+          }
+          
+          // For USDZ files (only if we haven't found a corresponding GLB)
+          if (pattern.includes('.usdz')) {
+            const files = await findFilesByExtension(directory, '.usdz');
+            for (const file of files) {
+              const usdzUrl = directory === '.' ? file : `${directory}/${file}`;
+              const baseName = file.replace(/\.usdz$/i, '');
+              const modelKey = baseName.toLowerCase();
+              
+              // Only add if we don't already have this model
+              if (!modelsMap.has(modelKey)) {
+                // Check for corresponding GLB
+                const possibleGlbNames = [
+                  file.replace(/\.usdz$/i, '.glb'),
+                  file.replace(/\.usdz$/i, '.GLB'),
+                  baseName.replace(/model[-_]/i, '') + '.glb',
+                  'model-' + baseName.replace(/model[-_]/i, '') + '.glb'
+                ];
+                
+                let glbUrl = null;
+                for (const glbName of possibleGlbNames) {
+                  const testGlbUrl = directory === '.' ? glbName : `${directory}/${glbName}`;
+                  if (await checkFileExists(testGlbUrl)) {
+                    glbUrl = testGlbUrl;
+                    break;
+                  }
+                }
+                
+                modelsMap.set(modelKey, {
+                  name: extractBaseName(file),
+                  glb: glbUrl,
+                  usdz: usdzUrl,
+                  baseName: baseName
+                });
+              }
+            }
+          }
+          
+          checkedCount++;
+          updateProgress(checkedCount, totalChecks);
         }
       }
       
-      // Also check known models as backup
-      for (const model of knownModels) {
-        const glbExists = await checkFileExists(model.glb);
-        if (glbExists && !availableModels.some(m => m.glb === model.glb)) {
-          availableModels.push(model);
-        }
-      }
+      // Convert Map to array
+      const models = Array.from(modelsMap.values());
       
-      return availableModels;
+      // Sort alphabetically
+      models.sort((a, b) => a.name.localeCompare(b.name));
+      
+      return models;
     }
     
-    // Format model name for display
-    function formatModelName(name) {
-      return name
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
+    // Helper function to find files by extension
+    async function findFilesByExtension(directory, extension) {
+      const files = [];
+      
+      // Try to get directory listing (this works on GitHub Pages for root directory)
+      try {
+        // For root directory, we can't list files, so we'll try common patterns
+        if (directory === '.') {
+          // We'll discover through patterns instead
+          return files;
+        }
+        
+        // For subdirectories, we can try to access them directly
+        const response = await fetch(directory + '/');
+        if (response.ok) {
+          const html = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const links = doc.querySelectorAll('a');
+          
+          links.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.toLowerCase().endsWith(extension.toLowerCase())) {
+              files.push(href.split('/').pop());
+            }
+          });
+        }
+      } catch (error) {
+        console.log(`Cannot list directory ${directory}:`, error.message);
+      }
+      
+      return files;
+    }
+    
+    // Update progress bar
+    function updateProgress(current, total) {
+      const progressFill = document.getElementById('progress-fill');
+      const modelCount = document.getElementById('model-count');
+      
+      const percent = Math.round((current / total) * 100);
+      progressFill.style.width = `${percent}%`;
+      
+      if (modelCount) {
+        modelCount.textContent = `Scanning... ${current}/${total}`;
+      }
     }
     
     // Function to render model list
@@ -269,16 +471,25 @@
       const modelList = document.getElementById('model-list');
       
       if (models.length === 0) {
-        modelList.innerHTML = '<div class="no-models">No models found. Please add model files to the repository.</div>';
+        modelList.innerHTML = `
+          <div class="no-models">
+            <p>No 3D models found.</p>
+            <p>Please add .glb or .usdz files to your repository.</p>
+            <p>Suggested naming: model-name.glb</p>
+          </div>
+        `;
         return;
       }
       
       modelList.innerHTML = models.map((model, index) => `
-        <div class="model-option ${index === 0 ? 'selected' : ''}" data-model='${JSON.stringify(model)}'>
+        <div class="model-option ${index === 0 ? 'selected' : ''}" data-model-index="${index}">
           <input type="radio" name="model-select" ${index === 0 ? 'checked' : ''} id="model-${index}">
           <label for="model-${index}" class="model-info">
             <div class="model-name">${model.name}</div>
-            <div class="model-files">Files: ${model.glb}, ${model.usdz}</div>
+            <div class="model-files">
+              ${model.glb ? '✓ GLB' : '✗ GLB'} 
+              ${model.usdz ? '✓ USDZ' : '✗ USDZ'}
+            </div>
           </label>
         </div>
       `).join('');
@@ -286,102 +497,144 @@
       // Add click handlers
       document.querySelectorAll('.model-option').forEach(option => {
         option.addEventListener('click', function() {
-          // Update selection UI
-          document.querySelectorAll('.model-option').forEach(opt => {
-            opt.classList.remove('selected');
-            opt.querySelector('input').checked = false;
-          });
-          
-          this.classList.add('selected');
-          this.querySelector('input').checked = true;
-          
-          // Load the selected model
-          const model = JSON.parse(this.dataset.model);
-          loadModel(model);
+          const index = parseInt(this.dataset.modelIndex);
+          selectModel(index);
         });
       });
+    }
+    
+    // Function to select a model
+    function selectModel(index) {
+      const model = discoveredModels[index];
       
-      // Load the first model by default
-      if (models.length > 0) {
-        loadModel(models[0]);
-      }
+      if (!model) return;
+      
+      // Update UI
+      document.querySelectorAll('.model-option').forEach((opt, i) => {
+        if (i === index) {
+          opt.classList.add('selected');
+          opt.querySelector('input').checked = true;
+        } else {
+          opt.classList.remove('selected');
+          opt.querySelector('input').checked = false;
+        }
+      });
+      
+      // Load the model
+      loadModel(model);
     }
     
     // Function to load a model into the viewer
-    function loadModel(model) {
+    async function loadModel(model) {
       const viewer = document.getElementById('ar-viewer');
-      const loading = document.getElementById('loading');
       const arButton = document.getElementById('ar-button');
+      const loading = document.getElementById('loading');
       
-      // Show loading
-      loading.classList.add('active');
+      // Show loading briefly
+      loading.classList.remove('hidden');
+      loading.querySelector('.loading-text').textContent = `Loading ${model.name}...`;
       
       // Set the model sources
-      viewer.src = model.glb;
-      viewer.iOSsrc = model.usdz; // For Quick Look on iOS
+      if (model.glb) {
+        viewer.src = model.glb;
+      }
       
-      // Update AR button to show model name
+      if (model.usdz) {
+        viewer.iOSsrc = model.usdz; // For Quick Look on iOS
+      }
+      
+      // Update AR button
       arButton.textContent = `👋 View ${model.name} in AR`;
       arButton.style.display = 'block';
-      
-      // Wait for model to load
-      viewer.addEventListener('load', () => {
-        loading.classList.remove('active');
-        
-        // Move AR button to model-viewer slot
-        viewer.appendChild(arButton);
-        
-        console.log(`Model loaded: ${model.name}`);
-      }, { once: true });
-      
-      // Handle errors
-      viewer.addEventListener('error', (error) => {
-        loading.classList.remove('active');
-        console.error('Error loading model:', error);
-        alert(`Failed to load model: ${model.name}. Please check if the file exists.`);
-      });
-    }
-    
-    // Function to setup AR button
-    function setupARButton() {
-      const arButton = document.getElementById('ar-button');
-      const viewer = document.getElementById('ar-viewer');
-      
-      // Set AR button slot
       arButton.setAttribute('slot', 'ar-button');
+      
+      // Store current model
+      currentModel = model;
+      
+      // Hide loading after a short delay
+      setTimeout(() => {
+        loading.classList.add('hidden');
+      }, 500);
+      
+      console.log(`Loaded model: ${model.name}`, model);
     }
     
     // Initialize the application
     async function init() {
       console.log('Initializing AR Model Viewer...');
       
-      // Setup AR button
-      setupARButton();
+      // Setup toggle button
+      document.getElementById('toggle-selector').addEventListener('click', () => {
+        const selector = document.getElementById('model-selector');
+        selector.classList.toggle('show');
+      });
       
-      // Try to discover models
+      // Setup AR button click
+      document.getElementById('ar-button').addEventListener('click', () => {
+        if (currentModel) {
+          console.log(`Launching AR for: ${currentModel.name}`);
+        }
+      });
+      
+      // Discover models
       try {
-        const models = await discoverModels();
-        console.log('Found models:', models);
-        renderModelList(models);
+        discoveredModels = await discoverAllModels();
+        console.log(`Found ${discoveredModels.length} models:`, discoveredModels);
+        
+        // Update loading screen
+        const loading = document.getElementById('loading');
+        if (discoveredModels.length > 0) {
+          loading.querySelector('.loading-text').textContent = `Found ${discoveredModels.length} models!`;
+          loading.querySelector('.model-count').textContent = 'Loading first model...';
+          
+          // Render model list
+          renderModelList(discoveredModels);
+          
+          // Load first model
+          if (discoveredModels.length > 0) {
+            selectModel(0);
+          }
+          
+          // Show model selector
+          setTimeout(() => {
+            loading.classList.add('hidden');
+            document.getElementById('model-selector').classList.add('show');
+          }, 1000);
+        } else {
+          loading.querySelector('.loading-text').textContent = 'No models found';
+          loading.querySelector('.model-count').textContent = 'Please add .glb/.usdz files to your repository';
+          
+          setTimeout(() => {
+            loading.classList.add('hidden');
+          }, 3000);
+        }
       } catch (error) {
-        console.error('Error discovering models:', error);
-        
-        // Fallback to known models
-        const fallbackModels = knownModels.filter(model => {
-          // You might want to check if files exist here too
-          return true;
-        });
-        
-        renderModelList(fallbackModels);
+        console.error('Error initializing:', error);
+        document.getElementById('loading').classList.add('hidden');
+        alert('Failed to initialize model viewer. Please check console for details.');
       }
     }
     
-    // Start the app when DOM is loaded
+    // Start the app
     document.addEventListener('DOMContentLoaded', init);
     
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      // You can add responsive adjustments here
+    // Close model selector when clicking outside
+    document.addEventListener('click', (event) => {
+      const selector = document.getElementById('model-selector');
+      const toggleBtn = document.getElementById('toggle-selector');
+      
+      if (selector.classList.contains('show') && 
+          !selector.contains(event.target) && 
+          !toggleBtn.contains(event.target)) {
+        selector.classList.remove('show');
+      }
+    });
+    
+    // Handle escape key to close selector
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        document.getElementById('model-selector').classList.remove('show');
+      }
     });
   </script>
 </body>
