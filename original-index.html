@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AR Model Viewer</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    body { margin: 0; }
+    model-viewer { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <!-- Corrected model-viewer tag: Note the closing '>' after shadow-intensity -->
+  <model-viewer
+    src="model.glb"
+    alt="3D Model"
+    ar
+    ar-modes="webxr quick-look"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1">
+    <!-- Custom AR Button -->
+    <button slot="ar-button" style="
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;">
+        👋 View in AR
+    </button>
+  </model-viewer> <!-- This is the closing tag for model-viewer -->
+</body>
+</html>
