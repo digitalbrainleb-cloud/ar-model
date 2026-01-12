@@ -8,228 +8,195 @@
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
     
     body {
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: #f5f5f5;
-      overflow-x: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
     }
     
     /* Header */
     .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #4285f4, #34a853);
       color: white;
-      padding: 1.5rem;
+      padding: 2rem 1rem;
       text-align: center;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
     }
     
     .header h1 {
-      margin: 0;
-      font-size: 2rem;
-      font-weight: 600;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
     }
     
     .header p {
-      margin: 0.5rem 0 0;
+      font-size: 1.2rem;
       opacity: 0.9;
-      font-size: 1.1rem;
     }
     
     /* Main Container */
-    .container {
-      display: flex;
-      flex-direction: column;
-      min-height: calc(100vh - 180px);
-      padding: 1rem;
+    .main-container {
       max-width: 1200px;
       margin: 0 auto;
+      padding: 2rem 1rem;
     }
     
-    /* Models Grid */
+    /* Models Grid - Simplified */
     .models-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 1.5rem;
-      margin-bottom: 2rem;
+      margin-bottom: 3rem;
     }
     
     @media (max-width: 768px) {
       .models-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
       }
     }
     
-    /* Model Card */
+    /* Model Card - Simplified */
     .model-card {
       background: white;
       border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 1.5rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
       cursor: pointer;
-      border: 3px solid transparent;
+      border: 2px solid transparent;
+      text-align: center;
     }
     
     .model-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     }
     
     .model-card.selected {
-      border-color: #667eea;
-    }
-    
-    .model-preview {
-      height: 200px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .model-preview::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30,30 L70,30 L70,70 L30,70 Z" fill="none" stroke="white" stroke-width="2" stroke-opacity="0.2"/></svg>');
-      background-size: 50px;
+      border-color: #4285f4;
+      background: #f0f7ff;
     }
     
     .model-icon {
-      font-size: 4rem;
-      opacity: 0.8;
-    }
-    
-    .model-info {
-      padding: 1.5rem;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
     }
     
     .model-name {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 600;
-      margin: 0 0 0.75rem;
+      margin-bottom: 0.5rem;
       color: #333;
+    }
+    
+    .model-desc {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
     }
     
     .model-files {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
     }
     
-    .file-badge {
-      padding: 0.4rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      font-weight: 500;
+    .file-indicator {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      background: #f0f0f0;
     }
     
-    .file-badge.glb {
-      background: #e3f2fd;
-      color: #1976d2;
-    }
-    
-    .file-badge.usdz {
-      background: #e8f5e9;
-      color: #388e3c;
-    }
-    
-    .file-badge.missing {
-      background: #ffebee;
-      color: #d32f2f;
-    }
-    
-    .model-description {
-      color: #666;
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-    
-    /* Viewer Container */
-    .viewer-container {
+    /* Viewer Section */
+    .viewer-section {
       background: white;
       border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      margin-top: 1rem;
+      padding: 2rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      margin-top: 2rem;
     }
     
     .viewer-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
       flex-wrap: wrap;
       gap: 1rem;
+      margin-bottom: 1.5rem;
     }
     
     .selected-model-info h2 {
-      margin: 0;
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       color: #333;
     }
     
-    .model-actions {
-      display: flex;
-      gap: 1rem;
-    }
-    
-    .btn {
-      padding: 0.8rem 1.5rem;
+    .ar-button {
+      background: linear-gradient(135deg, #4285f4, #34a853);
+      color: white;
       border: none;
+      padding: 1rem 2rem;
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      transition: all 0.3s ease;
     }
     
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-    
-    .btn-primary:hover {
+    .ar-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
     }
     
-    .btn-secondary {
-      background: #f5f5f5;
-      color: #333;
-    }
-    
-    .btn-secondary:hover {
-      background: #e0e0e0;
-    }
-    
-    .btn:disabled {
+    .ar-button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
+      transform: none;
+      box-shadow: none;
     }
     
-    /* Model Viewer */
+    /* Model Viewer - Static initially */
+    .model-viewer-placeholder {
+      width: 100%;
+      height: 400px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .model-viewer-placeholder {
+        height: 300px;
+      }
+    }
+    
+    .model-viewer-placeholder .placeholder-text {
+      text-align: center;
+      color: #666;
+    }
+    
+    .model-viewer-placeholder .placeholder-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
     #ar-viewer {
       width: 100%;
-      height: 500px;
+      height: 400px;
       border-radius: 8px;
-      overflow: hidden;
-      margin-top: 1rem;
-      background: #f8f9fa;
+      display: none; /* Hidden until model loads */
     }
     
     @media (max-width: 768px) {
@@ -238,317 +205,177 @@
       }
     }
     
-    /* Footer */
-    .footer {
-      background: #333;
-      color: white;
-      text-align: center;
-      padding: 1.5rem;
-      margin-top: 2rem;
-    }
-    
-    .footer p {
-      margin: 0;
-      font-size: 1rem;
-    }
-    
-    /* Loading and Error States */
+    /* Loading States */
     .loading {
       text-align: center;
       padding: 3rem;
     }
     
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #667eea;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
+    .loading.hidden {
+      display: none;
     }
     
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .error {
-      background: #ffebee;
-      border-left: 4px solid #d32f2f;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 2rem auto;
-      max-width: 600px;
+    .model-loading {
       text-align: center;
+      padding: 1rem;
+      color: #666;
+      font-style: italic;
     }
     
-    .error h3 {
-      color: #d32f2f;
-      margin-top: 0;
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 3rem;
     }
     
+    /* Instructions */
     .instructions {
       background: #e8f4fd;
       border-radius: 10px;
       padding: 1.5rem;
-      margin: 2rem 0;
-      border-left: 4px solid #1976d2;
+      margin-bottom: 2rem;
+      border-left: 4px solid #4285f4;
     }
     
     .instructions h3 {
-      color: #1976d2;
-      margin-top: 0;
+      color: #4285f4;
+      margin-bottom: 0.5rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
     
     .instructions ul {
-      margin: 1rem 0;
       padding-left: 1.5rem;
     }
     
     .instructions li {
       margin-bottom: 0.5rem;
-      line-height: 1.5;
-    }
-    
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 3rem;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    }
-    
-    .empty-state h2 {
-      color: #666;
-      margin-bottom: 1rem;
-    }
-    
-    .empty-state p {
-      color: #888;
-      max-width: 400px;
-      margin: 0 auto 1.5rem;
-      line-height: 1.6;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>🎮 AR Model Viewer</h1>
-    <p>Select a 3D model to view in Augmented Reality</p>
+    <h1>🧭 AR Model Viewer</h1>
+    <p>Select a model to view in Augmented Reality</p>
   </div>
   
-  <div class="container">
-    <!-- Instructions -->
+  <div class="main-container">
     <div class="instructions">
-      <h3>📚 How to Use:</h3>
+      <h3>📱 How to Use</h3>
       <ul>
-        <li>Select a model from the gallery below</li>
-        <li>Click "View in AR" to launch Augmented Reality mode</li>
-        <li>On mobile: Use camera to place the model in your space</li>
-        <li>On desktop: Use mouse to rotate and scroll to zoom</li>
+        <li>Click on any model card below to select it</li>
+        <li>Click "View in AR" to launch Augmented Reality</li>
+        <li>On iOS: Use Quick Look feature</li>
+        <li>On Android: Use WebXR with camera</li>
       </ul>
     </div>
     
-    <!-- Loading State -->
+    <!-- Quick loading state -->
     <div id="loading" class="loading">
-      <div class="spinner"></div>
-      <h2>Loading Models...</h2>
-      <p>Scanning for available 3D models</p>
+      <p>Loading available models...</p>
     </div>
     
-    <!-- Error State -->
-    <div id="error" class="error" style="display: none;">
-      <h3>⚠️ Error Loading Models</h3>
-      <p id="error-message"></p>
-      <button class="btn btn-primary" onclick="loadModels()">Retry</button>
-    </div>
+    <!-- Models Grid -->
+    <div id="models-grid" class="models-grid" style="display: none;"></div>
     
-    <!-- Main Content -->
-    <div id="content" style="display: none;">
-      <!-- Models Grid -->
-      <div id="models-grid" class="models-grid"></div>
-      
-      <!-- Selected Model Viewer -->
-      <div id="viewer-container" class="viewer-container" style="display: none;">
-        <div class="viewer-header">
-          <div class="selected-model-info">
-            <h2 id="selected-model-name">Select a Model</h2>
-          </div>
-          <div class="model-actions">
-            <button id="view-3d-btn" class="btn btn-secondary" disabled>
-              <span>👁️</span> View 3D
-            </button>
-            <button id="view-ar-btn" class="btn btn-primary" disabled>
-              <span>👋</span> View in AR
-            </button>
-          </div>
+    <!-- Viewer Section -->
+    <div id="viewer-section" class="viewer-section" style="display: none;">
+      <div class="viewer-header">
+        <div class="selected-model-info">
+          <h2 id="selected-model-name">Select a Model</h2>
+          <p id="selected-model-status" class="model-loading">Ready to load...</p>
         </div>
-        
-        <!-- Model Viewer -->
-        <model-viewer
-          id="ar-viewer"
-          alt="3D Model"
-          ar
-          ar-modes="webxr scene-viewer quick-look"
-          camera-controls
-          auto-rotate
-          shadow-intensity="1">
-        </model-viewer>
+        <button id="ar-button" class="ar-button" disabled>
+          <span>👋</span> View in AR
+        </button>
       </div>
       
-      <!-- Empty State -->
-      <div id="empty-state" class="empty-state" style="display: none;">
-        <h2>📦 No Models Found</h2>
-        <p>No 3D models were found in the repository. Please add .glb or .usdz files to get started.</p>
-        <div class="instructions">
-          <h3>🎯 How to add models:</h3>
-          <ol>
-            <li>Add your .glb and .usdz files to the repository</li>
-            <li>Name them like: <code>model-name.glb</code> and <code>model-name.usdz</code></li>
-            <li>Refresh this page to see your models</li>
-          </ol>
+      <div class="model-viewer-placeholder" id="viewer-placeholder">
+        <div class="placeholder-text">
+          <div class="placeholder-icon">🧊</div>
+          <p>Select a model to preview it here</p>
+          <p><small>3D preview will load when selected</small></p>
         </div>
       </div>
+      
+      <model-viewer
+        id="ar-viewer"
+        alt="3D Model"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        camera-controls
+        auto-rotate
+        shadow-intensity="1">
+      </model-viewer>
     </div>
   </div>
   
   <div class="footer">
-    <p>AR Model Viewer | Works on all modern browsers with WebXR support</p>
+    <p>AR Model Viewer | Compatible with modern browsers and mobile devices</p>
   </div>
 
   <script>
-    // Store models and state
-    let models = [];
-    let selectedModelIndex = -1;
-    
-    // Common model patterns to check
-    const COMMON_MODELS = [
-      // Add your known model patterns here
-      { pattern: 'model-shaker', name: 'Shaker' },
-      { pattern: 'model-christmas-frame', name: 'Christmas Frame' },
-      { pattern: 'model', name: 'Main Model' },
-      // Add more patterns as needed
+    // INSTANT LOAD - No file checking on page load!
+    // Just define your models here - add new ones as you create them
+    const MODELS = [
+      {
+        name: "Shaker",
+        glb: "model-shaker.glb",
+        usdz: "model-shaker.usdz",
+        description: "Interactive shaker model"
+      },
+      {
+        name: "Christmas Frame",
+        glb: "model-shaker-christmas-frame.glb",
+        usdz: "model-christmas-frame.usdz",
+        description: "Festive Christmas frame with shaker"
+      },
+      // Add more models here as you create them:
+      // {
+      //   name: "New Model",
+      //   glb: "model-new.glb",
+      //   usdz: "model-new.usdz",
+      //   description: "Description here"
+      // }
     ];
     
-    // Function to check if a file exists
-    async function checkFileExists(url) {
-      try {
-        const response = await fetch(url, { method: 'HEAD' });
-        return response.ok;
-      } catch (error) {
-        return false;
-      }
-    }
+    let currentModel = null;
+    let isModelLoading = false;
     
-    // Function to discover models
-    async function discoverModels() {
-      const discoveredModels = [];
-      
-      // Check common patterns
-      for (const item of COMMON_MODELS) {
-        const glbFile = `model-${item.pattern}.glb`;
-        const usdzFile = `model-${item.pattern}.usdz`;
-        
-        // Also check without "model-" prefix
-        const glbFileAlt = `${item.pattern}.glb`;
-        const usdzFileAlt = `${item.pattern}.usdz`;
-        
-        // Check all possible file combinations
-        const checks = [
-          { glb: glbFile, usdz: usdzFile },
-          { glb: glbFileAlt, usdz: usdzFileAlt },
-          { glb: glbFile, usdz: usdzFileAlt },
-          { glb: glbFileAlt, usdz: usdzFile }
-        ];
-        
-        for (const check of checks) {
-          const glbExists = await checkFileExists(check.glb);
-          const usdzExists = await checkFileExists(check.usdz);
-          
-          if (glbExists || usdzExists) {
-            // Found a valid model
-            discoveredModels.push({
-              id: item.pattern,
-              name: item.name,
-              glb: glbExists ? check.glb : null,
-              usdz: usdzExists ? check.usdz : null,
-              description: `3D Model: ${item.name}`
-            });
-            break; // Move to next pattern
-          }
-        }
-      }
-      
-      // If no common patterns found, try to auto-discover
-      if (discoveredModels.length === 0) {
-        // Try some default files
-        const defaultChecks = [
-          { glb: 'model.glb', usdz: 'model.usdz', name: 'Default Model' },
-          { glb: 'model-shaker.glb', usdz: 'model-shaker.usdz', name: 'Shaker' }
-          { glb: 'model-christmas-frame.glb', usdz: 'model-christmas-frame.usdz', name: 'Christmas Frame' }
-        ];
-        
-        for (const check of defaultChecks) {
-          const glbExists = await checkFileExists(check.glb);
-          const usdzExists = await checkFileExists(check.usdz);
-          
-          if (glbExists || usdzExists) {
-            discoveredModels.push({
-              id: check.name.toLowerCase().replace(' ', '-'),
-              name: check.name,
-              glb: glbExists ? check.glb : null,
-              usdz: usdzExists ? check.usdz : null,
-              description: `3D Model: ${check.name}`
-            });
-          }
-        }
-      }
-      
-      return discoveredModels;
-    }
-    
-    // Function to display models grid
-    function displayModels(modelList) {
+    // Function to show models immediately
+    function showModels() {
+      const loading = document.getElementById('loading');
       const grid = document.getElementById('models-grid');
-      const emptyState = document.getElementById('empty-state');
-      const content = document.getElementById('content');
+      const viewerSection = document.getElementById('viewer-section');
       
-      if (modelList.length === 0) {
-        content.style.display = 'block';
-        emptyState.style.display = 'block';
+      // Hide loading instantly
+      loading.style.display = 'none';
+      
+      if (MODELS.length === 0) {
+        grid.innerHTML = '<p style="text-align: center; padding: 2rem;">No models configured. Add models to the MODELS array in the script.</p>';
+        grid.style.display = 'block';
         return;
       }
       
-      emptyState.style.display = 'none';
-      
-      grid.innerHTML = modelList.map((model, index) => `
+      // Show models grid instantly
+      grid.innerHTML = MODELS.map((model, index) => `
         <div class="model-card ${index === 0 ? 'selected' : ''}" data-index="${index}">
-          <div class="model-preview">
-            <div class="model-icon">
-              ${model.glb ? '🧊' : '📦'}
-            </div>
-          </div>
-          <div class="model-info">
-            <h3 class="model-name">${model.name}</h3>
-            <div class="model-files">
-              <span class="file-badge ${model.glb ? 'glb' : 'missing'}">
-                ${model.glb ? '✓ GLB' : '✗ GLB'}
-              </span>
-              <span class="file-badge ${model.usdz ? 'usdz' : 'missing'}">
-                ${model.usdz ? '✓ USDZ' : '✗ USDZ'}
-              </span>
-            </div>
-            <p class="model-description">
-              ${model.description || '3D model for AR viewing'}
-            </p>
+          <span class="model-icon">${model.glb ? '🧊' : '📦'}</span>
+          <h3 class="model-name">${model.name}</h3>
+          <p class="model-desc">${model.description || '3D Model for AR'}</p>
+          <div class="model-files">
+            <span class="file-indicator">GLB</span>
+            <span class="file-indicator">USDZ</span>
           </div>
         </div>
       `).join('');
+      
+      grid.style.display = 'grid';
+      viewerSection.style.display = 'block';
       
       // Add click handlers
       document.querySelectorAll('.model-card').forEach(card => {
@@ -558,25 +385,20 @@
         });
       });
       
-      // Show content
-      content.style.display = 'block';
-      
-      // Select first model if available
-      if (modelList.length > 0) {
+      // Select first model
+      if (MODELS.length > 0) {
         selectModel(0);
       }
     }
     
     // Function to select a model
-    function selectModel(index) {
-      const model = models[index];
+    async function selectModel(index) {
+      if (isModelLoading) return;
       
+      const model = MODELS[index];
       if (!model) return;
       
-      // Update selected index
-      selectedModelIndex = index;
-      
-      // Update card selection
+      // Update UI selection
       document.querySelectorAll('.model-card').forEach((card, i) => {
         if (i === index) {
           card.classList.add('selected');
@@ -585,131 +407,129 @@
         }
       });
       
-      // Update viewer
-      updateViewer(model);
+      // Update viewer header
+      document.getElementById('selected-model-name').textContent = model.name;
+      document.getElementById('selected-model-status').textContent = 'Loading model...';
+      document.getElementById('ar-button').disabled = true;
+      
+      // Store current model
+      currentModel = model;
+      
+      // Load the model
+      await loadModel(model);
     }
     
-    // Function to update viewer with selected model
-    function updateViewer(model) {
+    // Function to load a model (only called when selected)
+    async function loadModel(model) {
+      isModelLoading = true;
+      
       const viewer = document.getElementById('ar-viewer');
-      const viewerContainer = document.getElementById('viewer-container');
-      const modelName = document.getElementById('selected-model-name');
-      const view3dBtn = document.getElementById('view-3d-btn');
-      const viewArBtn = document.getElementById('view-ar-btn');
+      const placeholder = document.getElementById('viewer-placeholder');
+      const arButton = document.getElementById('ar-button');
+      const statusText = document.getElementById('selected-model-status');
       
-      // Update model info
-      modelName.textContent = model.name;
-      
-      // Show viewer container
-      viewerContainer.style.display = 'block';
-      
-      // Update viewer source
-      if (model.glb) {
-        viewer.src = model.glb;
-        viewer.iOSsrc = model.usdz || null;
-        
-        // Enable buttons
-        view3dBtn.disabled = false;
-        viewArBtn.disabled = false;
-        
-        // Update AR button text
-        viewArBtn.innerHTML = `<span>👋</span> View ${model.name} in AR`;
-        
-        // Move AR button to viewer slot
-        viewArBtn.setAttribute('slot', 'ar-button');
-        viewer.appendChild(viewArBtn);
-        
-        // Set up 3D view button
-        view3dBtn.onclick = () => {
-          viewer.activateAR();
-        };
-        
-        console.log(`Loaded model: ${model.name}`, {
-          glb: model.glb,
-          usdz: model.usdz
-        });
-      } else {
-        // No GLB file, disable buttons
-        view3dBtn.disabled = true;
-        viewArBtn.disabled = true;
-        viewer.src = '';
-        viewer.iOSsrc = null;
-      }
-    }
-    
-    // Function to show error
-    function showError(message) {
-      const loading = document.getElementById('loading');
-      const error = document.getElementById('error');
-      const errorMessage = document.getElementById('error-message');
-      
-      loading.style.display = 'none';
-      errorMessage.textContent = message;
-      error.style.display = 'block';
-    }
-    
-    // Function to hide loading
-    function hideLoading() {
-      document.getElementById('loading').style.display = 'none';
-    }
-    
-    // Main initialization function
-    async function loadModels() {
       try {
-        // Hide error if showing
-        document.getElementById('error').style.display = 'none';
+        // Show loading state
+        statusText.textContent = 'Checking model files...';
         
-        // Discover models
-        models = await discoverModels();
+        // Check if GLB file exists
+        const glbExists = await checkFileExists(model.glb);
         
-        if (models.length === 0) {
-          hideLoading();
-          displayModels([]);
+        if (!glbExists) {
+          statusText.textContent = 'Error: GLB file not found';
+          arButton.disabled = true;
+          viewer.style.display = 'none';
+          placeholder.style.display = 'flex';
+          placeholder.innerHTML = `
+            <div class="placeholder-text">
+              <div class="placeholder-icon" style="color: #f44336;">❌</div>
+              <p>Model file not found: ${model.glb}</p>
+            </div>
+          `;
           return;
         }
         
-        // Display models
-        hideLoading();
-        displayModels(models);
+        // Check if USDZ file exists
+        const usdzExists = await checkFileExists(model.usdz);
         
-        console.log(`Found ${models.length} models:`, models);
+        // Update status
+        statusText.textContent = usdzExists ? 
+          '✓ Ready for AR on all devices' : 
+          '⚠ USDZ file missing (iOS Quick Look may not work)';
+        
+        // Load the model
+        viewer.src = model.glb;
+        viewer.iOSsrc = usdzExists ? model.usdz : null;
+        
+        // Wait for model to load
+        viewer.addEventListener('load', () => {
+          // Show viewer, hide placeholder
+          placeholder.style.display = 'none';
+          viewer.style.display = 'block';
+          
+          // Update AR button
+          arButton.innerHTML = `<span>👋</span> View ${model.name} in AR`;
+          arButton.disabled = false;
+          arButton.setAttribute('slot', 'ar-button');
+          viewer.appendChild(arButton);
+          
+          // Update status
+          statusText.textContent = '✓ Model loaded successfully';
+          isModelLoading = false;
+        }, { once: true });
+        
+        // Handle errors
+        viewer.addEventListener('error', () => {
+          statusText.textContent = 'Error loading model';
+          arButton.disabled = true;
+          isModelLoading = false;
+        }, { once: true });
+        
       } catch (error) {
-        console.error('Error loading models:', error);
-        showError('Failed to load models. Please check your internet connection and try again.');
+        console.error('Error loading model:', error);
+        statusText.textContent = 'Error loading model';
+        arButton.disabled = true;
+        isModelLoading = false;
+      }
+    }
+    
+    // Function to check if file exists (only called when needed)
+    async function checkFileExists(url) {
+      try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok;
+      } catch {
+        return false;
       }
     }
     
     // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', loadModels);
-    
-    // Add keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (models.length === 0) return;
+    document.addEventListener('DOMContentLoaded', () => {
+      // Show models INSTANTLY
+      showModels();
       
-      switch(e.key) {
-        case 'ArrowRight':
-        case 'ArrowDown':
-          e.preventDefault();
-          selectModel((selectedModelIndex + 1) % models.length);
-          break;
-        case 'ArrowLeft':
-        case 'ArrowUp':
-          e.preventDefault();
-          selectModel((selectedModelIndex - 1 + models.length) % models.length);
-          break;
-        case ' ':
-        case 'Enter':
-          e.preventDefault();
-          if (selectedModelIndex >= 0) {
-            document.getElementById('view-ar-btn').click();
-          }
-          break;
-      }
-    });
-    
-    // Add responsive adjustments on resize
-    window.addEventListener('resize', () => {
-      // Optional: Add responsive adjustments here
+      // Add keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (MODELS.length === 0) return;
+        
+        let currentIndex = Array.from(document.querySelectorAll('.model-card'))
+          .findIndex(card => card.classList.contains('selected'));
+        
+        if (currentIndex === -1) currentIndex = 0;
+        
+        switch(e.key) {
+          case 'ArrowRight':
+          case 'ArrowDown':
+            e.preventDefault();
+            selectModel((currentIndex + 1) % MODELS.length);
+            break;
+          case 'ArrowLeft':
+          case 'ArrowUp':
+            e.preventDefault();
+            selectModel((currentIndex - 1 + MODELS.length) % MODELS.length);
+            break;
+        }
+      });
     });
   </script>
 </body>
