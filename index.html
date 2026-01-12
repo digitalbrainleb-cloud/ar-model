@@ -9,99 +9,145 @@
       padding: 20px;
       max-width: 800px;
       margin: 0 auto;
+      background: #f5f5f5;
     }
     h1 {
       text-align: center;
+      color: #333;
     }
-    .model {
-      background: #f5f5f5;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 5px;
+    .model-list {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .model-item {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .model-name {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
     }
-    button {
-      background: #007AFF;
+    .ar-button {
+      background: #4285f4;
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
+      padding: 12px 24px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
+      width: 100%;
+      transition: background 0.3s;
     }
-    button:hover {
-      background: #0056CC;
+    .ar-button:hover {
+      background: #3367d6;
+    }
+    /* Hidden AR viewer */
+    #ar-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: white;
+      z-index: 1000;
+    }
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 1001;
     }
   </style>
 </head>
 <body>
-  <h1>AR Models</h1>
+  <h1>📱 AR Models</h1>
   
-  <div class="model">
-    <div class="model-name">Main Model</div>
-    <button onclick="openAR('model.glb', 'model.usdz')">View in AR</button>
-  </div>
-  
-  <div class="model">
-    <div class="model-name">Shaker</div>
-    <button onclick="openAR('model-shaker.glb', 'model-shaker.usdz')">View in AR</button>
-  </div>
-  
-  <div class="model">
-    <div class="model-name">Christmas Frame</div>
-    <button onclick="openAR('model-shaker-christmas-frame.glb', 'model-christmas-frame.usdz')">View in AR</button>
+  <div class="model-list">
+    <div class="model-item">
+      <div class="model-name">Main Model</div>
+      <button class="ar-button" onclick="showAR('model.glb', 'model.usdz', 'Main Model')">
+        👋 View in AR
+      </button>
+    </div>
+    
+    <div class="model-item">
+      <div class="model-name">Shaker</div>
+      <button class="ar-button" onclick="showAR('model-shaker.glb', 'model-shaker.usdz', 'Shaker')">
+        👋 View in AR
+      </button>
+    </div>
+    
+    <div class="model-item">
+      <div class="model-name">Christmas Frame</div>
+      <button class="ar-button" onclick="showAR('model-shaker-christmas-frame.glb', 'model-christmas-frame.usdz', 'Christmas Frame')">
+        👋 View in AR
+      </button>
+    </div>
   </div>
 
+  <!-- AR Viewer (hidden by default) -->
+  <div id="ar-container">
+    <button class="back-button" onclick="hideAR()">← Back to List</button>
+    <model-viewer
+      id="ar-viewer"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      camera-controls
+      auto-rotate
+      shadow-intensity="1">
+      <!-- AR button will be added by model-viewer -->
+    </model-viewer>
+  </div>
+
+  <!-- Load model-viewer -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  
   <script>
-    function openAR(glbFile, usdzFile) {
-      // Create a simple AR viewer page
-      const arHTML = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-        <style>
-          body { margin: 0; }
-          model-viewer { width: 100vw; height: 100vh; }
-        </style>
-      </head>
-      <body>
-        <model-viewer
-          src="${glbFile}"
-          ios-src="${usdzFile}"
-          ar
-          ar-modes="webxr scene-viewer quick-look"
-          camera-controls
-          auto-rotate>
-          <button slot="ar-button" style="
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 12px 24px;
-            background: #007AFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-          ">
-            View in AR
-          </button>
-        </model-viewer>
-      </body>
-      </html>
-      `;
+    // Show AR viewer with selected model
+    function showAR(glbFile, usdzFile, modelName) {
+      const viewer = document.getElementById('ar-viewer');
+      const container = document.getElementById('ar-container');
       
-      // Open in new tab
-      const newTab = window.open();
-      newTab.document.write(arHTML);
-      newTab.document.close();
+      // Set model files
+      viewer.src = glbFile;
+      viewer.iOSsrc = usdzFile;
+      viewer.alt = modelName;
+      
+      // Show AR viewer
+      container.style.display = 'block';
+      
+      // Hide the main list
+      document.querySelector('.model-list').style.display = 'none';
+      document.querySelector('h1').style.display = 'none';
+    }
+    
+    // Hide AR viewer and go back to list
+    function hideAR() {
+      const container = document.getElementById('ar-container');
+      
+      // Hide AR viewer
+      container.style.display = 'none';
+      
+      // Show the main list
+      document.querySelector('.model-list').style.display = 'flex';
+      document.querySelector('h1').style.display = 'block';
+      
+      // Clear the viewer
+      const viewer = document.getElementById('ar-viewer');
+      viewer.src = '';
+      viewer.iOSsrc = '';
     }
   </script>
 </body>
