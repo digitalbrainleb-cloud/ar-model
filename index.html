@@ -134,8 +134,8 @@
       transform: scale(0.98);
     }
     
-    /* Hidden AR container */
-    #ar-container {
+    /* AR View */
+    .ar-view {
       position: fixed;
       top: 0;
       left: 0;
@@ -145,13 +145,43 @@
       background: black;
       display: none;
     }
+    
+    .close-ar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .close-ar:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+    
+    model-viewer {
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>AR Gallery</h1>
-      <p class="subtitle">Tap any button to launch AR camera instantly</p>
+      <p class="subtitle">Tap any button to launch AR camera</p>
     </header>
     
     <div class="models-grid">
@@ -185,62 +215,67 @@
     </div>
   </div>
 
-  <!-- AR Container - Hidden by default -->
-  <div id="ar-container"></div>
+  <!-- AR View - Hidden by default -->
+  <div id="ar-view" class="ar-view">
+    <button class="close-ar" onclick="closeAR()">✕</button>
+  </div>
 
   <script>
-    async function openARCamera(glbFile) {
-      console.log('Launching AR for:', glbFile);
+    let currentViewer = null;
+    
+    function openARCamera(glbFile) {
+      console.log('Opening AR for:', glbFile);
       
-      const container = document.getElementById('ar-container');
-      container.innerHTML = '';
+      const arView = document.getElementById('ar-view');
+      arView.innerHTML = '<button class="close-ar" onclick="closeAR()">✕</button>';
       
       // Create model-viewer
-      const viewer = document.createElement('model-viewer');
-      viewer.src = glbFile;
-      viewer.ar = true;
-      viewer.arModes = 'webxr scene-viewer quick-look';
-      viewer.cameraControls = true;
-      viewer.autoRotate = true;
-      viewer.style.width = '100%';
-      viewer.style.height = '100%';
+      currentViewer = document.createElement('model-viewer');
+      currentViewer.src = glbFile;
+      currentViewer.ar = true;
+      currentViewer.arModes = 'webxr scene-viewer quick-look';
+      currentViewer.cameraControls = true;
+      currentViewer.autoRotate = true;
+      currentViewer.style.width = '100%';
+      currentViewer.style.height = '100%';
       
-      container.appendChild(viewer);
-      container.style.display = 'block';
+      arView.appendChild(currentViewer);
+      arView.style.display = 'block';
       
-      // Auto-launch AR after a short delay
+      // Try to auto-launch AR
       setTimeout(() => {
-        if (viewer.activateAR) {
-          viewer.activateAR();
+        if (currentViewer && currentViewer.activateAR) {
+          currentViewer.activateAR();
         }
       }, 300);
-      
-      // Close AR when session ends (when user exits AR mode)
-      viewer.addEventListener('ar-status', (event) => {
-        if (event.detail.status === 'not-presenting') {
-          container.style.display = 'none';
-          container.innerHTML = '';
-        }
-      });
-      
-      // Also close if user taps outside on mobile
-      container.addEventListener('click', function(e) {
-        if (e.target === container) {
-          container.style.display = 'none';
-          container.innerHTML = '';
-        }
-      });
     }
     
-    // Optional: Preload models for faster loading
-    window.addEventListener('load', function() {
-      const modelFiles = ['model.glb', 'hookah.glb'];
-      modelFiles.forEach(file => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'fetch';
-        link.href = file;
-        document.head.appendChild(link);
+    function closeAR() {
+      const arView = document.getElementById('ar-view');
+      arView.style.display = 'none';
+      arView.innerHTML = '<button class="close-ar" onclick="closeAR()">✕</button>';
+      
+      if (currentViewer) {
+        currentViewer = null;
+      }
+    }
+    
+    // Close AR when session ends automatically
+    document.addEventListener('DOMContentLoaded', function() {
+      const arView = document.getElementById('ar-view');
+      
+      // Listen for AR session end
+      arView.addEventListener('ar-status', function(event) {
+        if (event.detail && event.detail.status === 'not-presenting') {
+          closeAR();
+        }
+      });
+      
+      // Also close when tapping on dark background
+      arView.addEventListener('click', function(e) {
+        if (e.target === arView) {
+          closeAR();
+        }
       });
     });
   </script>
