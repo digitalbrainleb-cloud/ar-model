@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Models Gallery</title>
+  <title>AR Models</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
     * {
@@ -13,8 +13,8 @@
     }
     
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       padding: 20px;
     }
@@ -27,68 +27,83 @@
     header {
       text-align: center;
       margin-bottom: 40px;
-      padding: 20px;
+      padding: 30px 20px;
+      color: white;
     }
     
     h1 {
-      font-size: 2.5rem;
+      font-size: 3rem;
       margin-bottom: 10px;
-      color: #333;
+      font-weight: 800;
+      letter-spacing: -0.5px;
     }
     
     .subtitle {
-      font-size: 1.2rem;
-      color: #666;
+      font-size: 1.3rem;
+      opacity: 0.9;
+      font-weight: 300;
     }
     
     /* Models Grid */
     .models-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+      padding: 20px;
     }
     
     @media (max-width: 768px) {
       .models-grid {
         grid-template-columns: 1fr;
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 2.5rem;
       }
     }
     
     .model-card {
-      background: white;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
     .model-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-10px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
     }
     
-    .model-thumbnail {
-      height: 150px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .model-preview {
+      width: 100%;
+      height: 250px;
+      background: #f8f9fa;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
     
-    .thumbnail-icon {
-      font-size: 60px;
-      color: white;
-      opacity: 0.9;
+    .model-icon {
+      font-size: 80px;
+      opacity: 0.7;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
     }
     
     .model-info {
-      padding: 20px;
+      padding: 25px;
     }
     
     .model-name {
-      font-size: 1.4rem;
-      font-weight: bold;
+      font-size: 1.6rem;
+      font-weight: 700;
       color: #333;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       text-align: center;
     }
     
@@ -96,122 +111,111 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      padding: 15px;
+      padding: 18px;
       width: 100%;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      font-weight: bold;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
+      letter-spacing: 0.5px;
     }
     
     .ar-button:hover {
-      transform: scale(1.02);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
     }
     
-    /* Hidden AR Viewers (one for each model) */
-    .ar-viewer {
+    .ar-button:active {
+      transform: scale(0.98);
+    }
+    
+    /* Hidden AR container */
+    #ar-container {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       z-index: 1000;
+      background: black;
       display: none;
-    }
-    
-    model-viewer {
-      width: 100%;
-      height: 100%;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>📱 AR Models</h1>
-      <p class="subtitle">Click any button to open AR camera directly</p>
+      <h1>AR Gallery</h1>
+      <p class="subtitle">Tap any button to launch AR camera instantly</p>
     </header>
     
-    <!-- Models Grid -->
     <div class="models-grid">
-      <!-- Model 1: Main Model -->
+      <!-- Model 1 -->
       <div class="model-card">
-        <div class="model-thumbnail">
-          <div class="thumbnail-icon">🧊</div>
+        <div class="model-preview">
+          <div class="model-icon">🧊</div>
         </div>
         <div class="model-info">
-          <div class="model-name">Main Model</div>
-          <button class="ar-button" onclick="openARCamera('model.glb', 'model.usdz')">
-            <span>👋</span> View in AR
+          <div class="model-name">Crystal Model</div>
+          <button class="ar-button" onclick="openARCamera('model.glb')">
+            <span>📱</span> View in AR
           </button>
         </div>
       </div>
       
-      <!-- Model 2: Hookah -->
+      <!-- Model 2 -->
       <div class="model-card">
-        <div class="model-thumbnail">
-          <div class="thumbnail-icon">🎁</div>
+        <div class="model-preview">
+          <div class="model-icon">💎</div>
         </div>
         <div class="model-info">
           <div class="model-name">Hookah</div>
-          <button class="ar-button" onclick="openARCamera('hookah.glb', 'hookah.usdz')">
-            <span>👋</span> View in AR
+          <button class="ar-button" onclick="openARCamera('hookah.glb')">
+            <span>📱</span> View in AR
           </button>
         </div>
       </div>
-
+      
+      <!-- Add more models as needed -->
     </div>
   </div>
 
-  <!-- Hidden AR Viewer Container -->
-  <div id="ar-container" style="display: none;"></div>
+  <!-- AR Container - Hidden by default -->
+  <div id="ar-container"></div>
 
   <script>
-    // Function to open AR camera directly
-    function openARCamera(glbFile, usdzFile) {
-      console.log('Opening AR camera for:', glbFile);
+    async function openARCamera(glbFile) {
+      console.log('Launching AR for:', glbFile);
       
-      // Remove any existing AR viewer
       const container = document.getElementById('ar-container');
       container.innerHTML = '';
       
-      // Create the model-viewer element
+      // Create model-viewer
       const viewer = document.createElement('model-viewer');
-      
-      // Configure the viewer
       viewer.src = glbFile;
-      viewer.iOSsrc = usdzFile;
-      viewer.alt = "3D Model";
       viewer.ar = true;
-      viewer.arModes = "webxr quick-look";
+      viewer.arModes = 'webxr scene-viewer quick-look';
       viewer.cameraControls = true;
       viewer.autoRotate = true;
-      viewer.shadowIntensity = 1;
+      viewer.style.width = '100%';
+      viewer.style.height = '100%';
       
-      // Make it fullscreen
-      viewer.style.width = '100vw';
-      viewer.style.height = '100vh';
-      
-      // Add to container
       container.appendChild(viewer);
-      
-      // Show the container
       container.style.display = 'block';
       
-      // Trigger AR mode after a short delay to ensure the viewer is ready
+      // Auto-launch AR after a short delay
       setTimeout(() => {
         if (viewer.activateAR) {
           viewer.activateAR();
         }
-      }, 500);
+      }, 300);
       
-      // Listen for AR session end to go back to gallery
+      // Close AR when session ends (when user exits AR mode)
       viewer.addEventListener('ar-status', (event) => {
         if (event.detail.status === 'not-presenting') {
           container.style.display = 'none';
@@ -219,37 +223,26 @@
         }
       });
       
-      // Add back button
-      const backButton = document.createElement('button');
-      backButton.innerHTML = '← Back';
-      backButton.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        padding: 12px 24px;
-        background: white;
-        color: #333;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 1001;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      `;
-      
-      backButton.onclick = function() {
-        container.style.display = 'none';
-        container.innerHTML = '';
-      };
-      
-      document.body.appendChild(backButton);
-      
-      // Remove back button when AR session ends
-      viewer.addEventListener('ar-status', () => {
-        backButton.remove();
+      // Also close if user taps outside on mobile
+      container.addEventListener('click', function(e) {
+        if (e.target === container) {
+          container.style.display = 'none';
+          container.innerHTML = '';
+        }
       });
     }
+    
+    // Optional: Preload models for faster loading
+    window.addEventListener('load', function() {
+      const modelFiles = ['model.glb', 'hookah.glb'];
+      modelFiles.forEach(file => {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'fetch';
+        link.href = file;
+        document.head.appendChild(link);
+      });
+    });
   </script>
 </body>
 </html>
