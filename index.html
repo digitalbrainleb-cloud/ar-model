@@ -192,7 +192,7 @@
         </div>
         <div class="model-info">
           <div class="model-name">Christmas Cherry</div>
-          <button class="ar-button" onclick="openARCamera('model.glb')">
+          <button class="ar-button" onclick="openARCamera('model.glb', 'cherry')">
             <span>📱</span> View in AR
           </button>
         </div>
@@ -205,7 +205,7 @@
         </div>
         <div class="model-info">
           <div class="model-name">Hookah</div>
-          <button class="ar-button" onclick="openARCamera('hookah.glb')">
+          <button class="ar-button" onclick="openARCamera('hookah.glb', 'hookah')">
             <span>📱</span> View in AR
           </button>
         </div>
@@ -218,13 +218,24 @@
         </div>
         <div class="model-info">
           <div class="model-name">Burger</div>
-          <button class="ar-button" onclick="openARCamera('burger.glb')">
+          <button class="ar-button" onclick="openARCamera('burger.glb', 'burger')">
             <span>📱</span> View in AR
           </button>
         </div>
       </div>
-      
-      <!-- Add more models as needed -->
+
+      <!-- Model 4 -->
+      <div class="model-card">
+        <div class="model-preview">
+          <div class="model-icon">🧊</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">Hand Bag</div>
+          <button class="ar-button" onclick="openARCamera('handbag.glb', 'handbag')">
+            <span>📱</span> View in AR
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -236,11 +247,38 @@
   <script>
     let currentViewer = null;
     
-    function openARCamera(glbFile) {
-      console.log('Opening AR for:', glbFile);
+    // Model configuration - EASY TO MODIFY LATER
+    const modelConfig = {
+      'cherry': {
+        scale: '0.15 0.15 0.15',     // 15% scale
+        cameraOrbit: '45deg 55deg 1.5m',
+        fieldOfView: '30deg'
+      },
+      'hookah': {
+        scale: '0.15 0.15 0.15',     // 15% scale
+        cameraOrbit: '45deg 55deg 1.5m',
+        fieldOfView: '30deg'
+      },
+      'burger': {
+        scale: '0.15 0.15 0.15',     // 15% scale
+        cameraOrbit: '45deg 55deg 1.5m',
+        fieldOfView: '30deg'
+      },
+      'handbag': {
+        scale: '0.15 0.15 0.15',     // 15% scale
+        cameraOrbit: '45deg 55deg 1.5m',
+        fieldOfView: '30deg'
+      }
+    };
+    
+    function openARCamera(glbFile, modelId) {
+      console.log('Opening AR for:', glbFile, 'Model ID:', modelId);
       
       const arView = document.getElementById('ar-view');
       arView.innerHTML = '<button class="close-ar" onclick="closeAR()">✕</button>';
+      
+      // Get configuration for this model
+      const config = modelConfig[modelId] || modelConfig['cherry']; // fallback
       
       // Create model-viewer
       currentViewer = document.createElement('model-viewer');
@@ -249,6 +287,12 @@
       currentViewer.arModes = 'webxr scene-viewer quick-look';
       currentViewer.cameraControls = true;
       currentViewer.autoRotate = true;
+      
+      // Apply individual model settings
+      currentViewer.scale = config.scale;
+      currentViewer.cameraOrbit = config.cameraOrbit;
+      currentViewer.fieldOfView = config.fieldOfView;
+      
       currentViewer.style.width = '100%';
       currentViewer.style.height = '100%';
       
