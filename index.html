@@ -132,7 +132,7 @@
         </div>
         <div class="model-info">
           <div class="model-name">Christmas Cherry</div>
-          <button class="ar-button" onclick="openAR('model.glb', 'cherry', 0.35)">
+          <button class="ar-button" onclick="openAR('model.glb', 'model.usdz', 0.35)">
             <span>📱</span> View in AR
           </button>
         </div>
@@ -145,7 +145,7 @@
         </div>
         <div class="model-info">
           <div class="model-name">Hookah</div>
-          <button class="ar-button" onclick="openAR('hookah.glb', 'hookah', 0.40)">
+          <button class="ar-button" onclick="openAR('hookah.glb', 'hookah.usdz', 0.40)">
             <span>📱</span> View in AR
           </button>
         </div>
@@ -158,7 +158,7 @@
         </div>
         <div class="model-info">
           <div class="model-name">Souvenir</div>
-          <button class="ar-button" onclick="openAR('souvenir.glb', 'souvenir', 0.24)">
+          <button class="ar-button" onclick="openAR('souvenir.glb', 'souvenir.usdz', 0.24)">
             <span>📱</span> View in AR
           </button>
         </div>
@@ -171,7 +171,7 @@
         </div>
         <div class="model-info">
           <div class="model-name">Hand Bag</div>
-          <button class="ar-button" onclick="openAR('handbag.glb', 'handbag', 0.35)">
+          <button class="ar-button" onclick="openAR('handbag.glb', 'handbag.usdz', 0.35)">
             <span>📱</span> View in AR
           </button>
         </div>
@@ -187,36 +187,29 @@
     // Get the base URL for your models
     const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
     
-    async function openAR(modelFile, modelName, desiredScale) {
-      console.log(`Opening ${modelName} at ${desiredScale * 100}% scale`);
+    function openAR(glbFile, usdzFile, desiredScale) {
+      console.log(`Opening AR with scale: ${desiredScale * 100}%`);
       console.log(`Platform: ${isIOS ? 'iOS' : isAndroid ? 'Android' : 'Other'}`);
       
-      const modelUrl = baseUrl + modelFile;
-      
       if (isIOS) {
-        // iOS: Use AR Quick Look with URL parameters
-        // Note: iOS requires .usdz format, not .glb
-        // If you have .usdz files, use them instead
-        const usdzFile = modelFile.replace('.glb', '.usdz');
+        // iOS: Use AR Quick Look with USDZ file and scale parameter
         const usdzUrl = baseUrl + usdzFile;
-        
-        // iOS AR Quick Look URL with scale parameter (works on iOS 15.5+)
-        // Add #scale=0.24 to set initial scale to 24%
+        // The #scale=X parameter works on iOS 15.5+ to set initial scale
         const arUrl = `${usdzUrl}#scale=${desiredScale}`;
         
-        console.log('Opening iOS AR Quick Look with URL:', arUrl);
+        console.log('Opening iOS AR Quick Look:', arUrl);
         
-        // Create a temporary link and click it
+        // Create an anchor element with ar attribute
         const link = document.createElement('a');
         link.rel = 'ar';
         link.href = arUrl;
-        link.download = usdzFile;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         
       } else if (isAndroid) {
-        // Android: Use Scene Viewer Intent with scale parameter
+        // Android: Use Scene Viewer Intent with GLB file and scale parameter
+        const modelUrl = baseUrl + glbFile;
         const encodedUrl = encodeURIComponent(modelUrl);
         
         // Android Intent with scale parameter - THIS WORKS!
@@ -225,73 +218,20 @@
         console.log('Opening Android Scene Viewer with scale:', desiredScale);
         window.location.href = intentUrl;
         
-        // Fallback if intent fails
+        // Fallback if intent fails (opens in browser)
         setTimeout(() => {
           window.location.href = `https://arvr.google.com/scene-viewer/1.0?file=${encodedUrl}&mode=ar_preferred&enable_scale=true&scale=${desiredScale}`;
         }, 500);
         
       } else {
-        // Desktop or other: Use model-viewer as fallback
-        showModelViewerFallback(modelUrl, modelName, desiredScale);
+        // Desktop: Show message
+        alert('AR is only supported on mobile devices (iOS or Android). Please open this page on your phone.');
       }
-    }
-    
-    // Fallback for desktop browsers
-    function showModelViewerFallback(modelUrl, modelName, desiredScale) {
-      // Create modal with model-viewer
-      const modal = document.createElement('div');
-      modal.style.position = 'fixed';
-      modal.style.top = '0';
-      modal.style.left = '0';
-      modal.style.width = '100%';
-      modal.style.height = '100%';
-      modal.style.backgroundColor = 'black';
-      modal.style.zIndex = '10000';
-      
-      const closeBtn = document.createElement('button');
-      closeBtn.textContent = '✕';
-      closeBtn.style.position = 'absolute';
-      closeBtn.style.top = '20px';
-      closeBtn.style.right = '20px';
-      closeBtn.style.width = '50px';
-      closeBtn.style.height = '50px';
-      closeBtn.style.borderRadius = '50%';
-      closeBtn.style.backgroundColor = 'rgba(255,255,255,0.2)';
-      closeBtn.style.color = 'white';
-      closeBtn.style.border = 'none';
-      closeBtn.style.fontSize = '24px';
-      closeBtn.style.cursor = 'pointer';
-      closeBtn.style.zIndex = '10001';
-      closeBtn.onclick = () => modal.remove();
-      
-      const viewer = document.createElement('model-viewer');
-      viewer.src = modelUrl;
-      viewer.ar = true;
-      viewer.arModes = 'webxr scene-viewer quick-look';
-      viewer.cameraControls = true;
-      viewer.autoRotate = true;
-      viewer.scale = `${desiredScale} ${desiredScale} ${desiredScale}`;
-      viewer.style.width = '100%';
-      viewer.style.height = '100%';
-      
-      modal.appendChild(closeBtn);
-      modal.appendChild(viewer);
-      document.body.appendChild(modal);
-      
-      // Auto-activate AR if possible
-      setTimeout(() => {
-        if (viewer.activateAR) {
-          viewer.activateAR();
-        }
-      }, 1000);
     }
     
     console.log('AR Gallery Ready!');
     console.log(`iOS: ${isIOS}, Android: ${isAndroid}`);
-    console.log('Souvenir will open at 24% scale automatically');
+    console.log('Souvenir will open at 24% scale automatically on both platforms!');
   </script>
-  
-  <!-- Load model-viewer for fallback only -->
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 </body>
 </html>
