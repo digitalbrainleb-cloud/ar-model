@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>AR Models</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
@@ -247,27 +247,27 @@
   <script>
     let currentViewer = null;
     
-    // Model configuration - EASY TO MODIFY LATER
+    // Model configuration - ADJUSTABLE SCALE FOR EACH MODEL
     const modelConfig = {
       'cherry': {
-        scale: '0.15 0.15 0.15',     // 15% scale
-        cameraOrbit: '45deg 55deg 1.5m',
-        fieldOfView: '30deg'
+        scale: '0.08 0.08 0.08',     // 8% scale - very small
+        cameraOrbit: '0deg 90deg 1m',
+        fieldOfView: '45deg'
       },
       'hookah': {
-        scale: '0.15 0.15 0.15',     // 15% scale
-        cameraOrbit: '45deg 55deg 1.5m',
-        fieldOfView: '30deg'
+        scale: '0.08 0.08 0.08',     // 8% scale
+        cameraOrbit: '0deg 90deg 1m',
+        fieldOfView: '45deg'
       },
       'souvenir': {
-        scale: '0.15 0.15 0.15',     // 15% scale
-        cameraOrbit: '45deg 55deg 1.5m',
-        fieldOfView: '30deg'
+        scale: '0.06 0.06 0.06',     // 6% scale - even smaller for souvenir
+        cameraOrbit: '0deg 90deg 1m',
+        fieldOfView: '45deg'
       },
       'handbag': {
-        scale: '0.15 0.15 0.15',     // 15% scale
-        cameraOrbit: '45deg 55deg 1.5m',
-        fieldOfView: '30deg'
+        scale: '0.08 0.08 0.08',     // 8% scale
+        cameraOrbit: '0deg 90deg 1m',
+        fieldOfView: '45deg'
       }
     };
     
@@ -278,7 +278,7 @@
       arView.innerHTML = '<button class="close-ar" onclick="closeAR()">✕</button>';
       
       // Get configuration for this model
-      const config = modelConfig[modelId] || modelConfig['cherry']; // fallback
+      const config = modelConfig[modelId] || modelConfig['cherry'];
       
       // Create model-viewer
       currentViewer = document.createElement('model-viewer');
@@ -287,11 +287,16 @@
       currentViewer.arModes = 'webxr scene-viewer quick-look';
       currentViewer.cameraControls = true;
       currentViewer.autoRotate = true;
+      currentViewer.autoScale = 'auto';  // Auto-scale the model
       
       // Apply individual model settings
       currentViewer.scale = config.scale;
       currentViewer.cameraOrbit = config.cameraOrbit;
       currentViewer.fieldOfView = config.fieldOfView;
+      
+      // Additional size control attributes
+      currentViewer.setAttribute('min-scale', '0.01');
+      currentViewer.setAttribute('max-scale', '0.5');
       
       currentViewer.style.width = '100%';
       currentViewer.style.height = '100%';
@@ -299,12 +304,21 @@
       arView.appendChild(currentViewer);
       arView.style.display = 'block';
       
-      // Try to auto-launch AR
+      // Wait for model to load before AR
+      currentViewer.addEventListener('load', () => {
+        setTimeout(() => {
+          if (currentViewer && currentViewer.activateAR) {
+            currentViewer.activateAR();
+          }
+        }, 500);
+      });
+      
+      // Fallback in case load event doesn't fire
       setTimeout(() => {
-        if (currentViewer && currentViewer.activateAR) {
+        if (currentViewer && currentViewer.activateAR && !currentViewer.loaded) {
           currentViewer.activateAR();
         }
-      }, 300);
+      }, 1500);
     }
     
     function closeAR() {
