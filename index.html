@@ -44,7 +44,6 @@
       font-weight: 300;
     }
     
-    /* Models Grid */
     .models-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -134,7 +133,6 @@
       transform: scale(0.98);
     }
     
-    /* AR View */
     .ar-view {
       position: fixed;
       top: 0;
@@ -185,10 +183,9 @@
     </header>
     
     <div class="models-grid">
-      <!-- Model 1 -->
       <div class="model-card">
         <div class="model-preview">
-          <div class="model-icon">🧊</div>
+          <div class="model-icon">🎄</div>
         </div>
         <div class="model-info">
           <div class="model-name">Christmas Cherry</div>
@@ -198,10 +195,9 @@
         </div>
       </div>
       
-      <!-- Model 2 -->
       <div class="model-card">
         <div class="model-preview">
-          <div class="model-icon">💎</div>
+          <div class="model-icon">💨</div>
         </div>
         <div class="model-info">
           <div class="model-name">Hookah</div>
@@ -211,10 +207,9 @@
         </div>
       </div>
 
-      <!-- Model 3 -->
       <div class="model-card">
         <div class="model-preview">
-          <div class="model-icon">🧊</div>
+          <div class="model-icon">🏺</div>
         </div>
         <div class="model-info">
           <div class="model-name">Souvenir</div>
@@ -224,10 +219,9 @@
         </div>
       </div>
 
-      <!-- Model 4 -->
       <div class="model-card">
         <div class="model-preview">
-          <div class="model-icon">🧊</div>
+          <div class="model-icon">👜</div>
         </div>
         <div class="model-info">
           <div class="model-name">Hand Bag</div>
@@ -239,7 +233,6 @@
     </div>
   </div>
 
-  <!-- AR View - Hidden by default -->
   <div id="ar-view" class="ar-view">
     <button class="close-ar" onclick="closeAR()">✕</button>
   </div>
@@ -247,56 +240,55 @@
   <script>
     let currentViewer = null;
     
-    // Model configuration - ADJUSTABLE SCALE FOR EACH MODEL
+    // Model configuration with proper AR scaling
     const modelConfig = {
       'cherry': {
-        scale: '0.08 0.08 0.08',     // 8% scale - very small
-        cameraOrbit: '0deg 90deg 1m',
-        fieldOfView: '45deg'
+        scale: '0.5 0.5 0.5',
+        cameraOrbit: '45deg 55deg 2m'
       },
       'hookah': {
-        scale: '0.08 0.08 0.08',     // 8% scale
-        cameraOrbit: '0deg 90deg 1m',
-        fieldOfView: '45deg'
+        scale: '0.4 0.4 0.4',
+        cameraOrbit: '45deg 55deg 2m'
       },
       'souvenir': {
-        scale: '0.06 0.06 0.06',     // 6% scale - even smaller for souvenir
-        cameraOrbit: '0deg 90deg 1m',
-        fieldOfView: '45deg'
+        scale: '0.25 0.25 0.25',  // 25% size - adjusted for souvenir
+        cameraOrbit: '45deg 55deg 2m'
       },
       'handbag': {
-        scale: '0.08 0.08 0.08',     // 8% scale
-        cameraOrbit: '0deg 90deg 1m',
-        fieldOfView: '45deg'
+        scale: '0.35 0.35 0.35',
+        cameraOrbit: '45deg 55deg 2m'
       }
     };
     
     function openARCamera(glbFile, modelId) {
-      console.log('Opening AR for:', glbFile, 'Model ID:', modelId);
+      console.log('Opening AR for:', glbFile);
       
       const arView = document.getElementById('ar-view');
       arView.innerHTML = '<button class="close-ar" onclick="closeAR()">✕</button>';
       
-      // Get configuration for this model
-      const config = modelConfig[modelId] || modelConfig['cherry'];
+      const config = modelConfig[modelId];
       
-      // Create model-viewer
+      // Create model-viewer with proper AR attributes
       currentViewer = document.createElement('model-viewer');
       currentViewer.src = glbFile;
+      currentViewer.alt = `3D model of ${modelId}`;
       currentViewer.ar = true;
-      currentViewer.arModes = 'webxr scene-viewer quick-look';
+      currentViewer.arModes = "webxr scene-viewer quick-look";
       currentViewer.cameraControls = true;
       currentViewer.autoRotate = true;
-      currentViewer.autoScale = 'auto';  // Auto-scale the model
+      currentViewer.disableZoom = false;
+      currentViewer.interactionPrompt = "auto";
       
-      // Apply individual model settings
+      // CRITICAL: Set scale for AR mode
       currentViewer.scale = config.scale;
-      currentViewer.cameraOrbit = config.cameraOrbit;
-      currentViewer.fieldOfView = config.fieldOfView;
       
-      // Additional size control attributes
-      currentViewer.setAttribute('min-scale', '0.01');
-      currentViewer.setAttribute('max-scale', '0.5');
+      // Set camera position for better view
+      currentViewer.cameraOrbit = config.cameraOrbit;
+      
+      // These help with sizing in AR
+      currentViewer.setAttribute('environment-image', 'neutral');
+      currentViewer.setAttribute('shadow-intensity', '1');
+      currentViewer.setAttribute('exposure', '1');
       
       currentViewer.style.width = '100%';
       currentViewer.style.height = '100%';
@@ -304,8 +296,13 @@
       arView.appendChild(currentViewer);
       arView.style.display = 'block';
       
-      // Wait for model to load before AR
+      // Force AR to activate with the scale applied
       currentViewer.addEventListener('load', () => {
+        console.log('Model loaded, applying scale:', config.scale);
+        // Re-apply scale after load to ensure it takes effect
+        currentViewer.scale = config.scale;
+        
+        // Small delay before activating AR
         setTimeout(() => {
           if (currentViewer && currentViewer.activateAR) {
             currentViewer.activateAR();
@@ -313,12 +310,12 @@
         }, 500);
       });
       
-      // Fallback in case load event doesn't fire
+      // Fallback activation
       setTimeout(() => {
-        if (currentViewer && currentViewer.activateAR && !currentViewer.loaded) {
+        if (currentViewer && currentViewer.activateAR) {
           currentViewer.activateAR();
         }
-      }, 1500);
+      }, 2000);
     }
     
     function closeAR() {
@@ -331,18 +328,15 @@
       }
     }
     
-    // Close AR when session ends automatically
     document.addEventListener('DOMContentLoaded', function() {
       const arView = document.getElementById('ar-view');
       
-      // Listen for AR session end
       arView.addEventListener('ar-status', function(event) {
         if (event.detail && event.detail.status === 'not-presenting') {
           closeAR();
         }
       });
       
-      // Also close when tapping on dark background
       arView.addEventListener('click', function(e) {
         if (e.target === arView) {
           closeAR();
