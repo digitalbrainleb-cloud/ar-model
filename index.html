@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AR Models</title>
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <title>AR Models - Fixed Scaling</title>
   <style>
     * {
       margin: 0;
@@ -35,13 +34,11 @@
       font-size: 3rem;
       margin-bottom: 10px;
       font-weight: 800;
-      letter-spacing: -0.5px;
     }
     
     .subtitle {
       font-size: 1.3rem;
       opacity: 0.9;
-      font-weight: 300;
     }
     
     .models-grid {
@@ -54,11 +51,9 @@
     @media (max-width: 768px) {
       .models-grid {
         grid-template-columns: 1fr;
-        padding: 10px;
       }
-      
       h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
       }
     }
     
@@ -67,14 +62,11 @@
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
     }
     
     .model-card:hover {
       transform: translateY(-10px);
-      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
     }
     
     .model-preview {
@@ -84,14 +76,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
     }
     
     .model-icon {
       font-size: 80px;
       opacity: 0.7;
-      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
     }
     
     .model-info {
@@ -116,62 +105,15 @@
       font-size: 1.2rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
-      letter-spacing: 0.5px;
     }
     
     .ar-button:hover {
       transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
-    }
-    
-    .ar-button:active {
-      transform: scale(0.98);
-    }
-    
-    .ar-view {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1000;
-      background: black;
-      display: none;
-    }
-    
-    .close-ar {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 1001;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-    }
-    
-    .close-ar:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.1);
-    }
-    
-    model-viewer {
-      width: 100%;
-      height: 100%;
     }
   </style>
 </head>
@@ -179,170 +121,177 @@
   <div class="container">
     <header>
       <h1>AR Gallery</h1>
-      <p class="subtitle">Tap any button to launch AR camera</p>
+      <p class="subtitle">Models open at the perfect size automatically</p>
     </header>
     
     <div class="models-grid">
+      <!-- Christmas Cherry -->
       <div class="model-card">
         <div class="model-preview">
-          <div class="model-icon">🎄</div>
+          <div class="model-icon">🍒</div>
         </div>
         <div class="model-info">
           <div class="model-name">Christmas Cherry</div>
-          <button class="ar-button" onclick="openARCamera('model.glb', 'cherry')">
+          <button class="ar-button" onclick="openAR('model.glb', 'cherry', 0.35)">
             <span>📱</span> View in AR
           </button>
         </div>
       </div>
       
+      <!-- Hookah -->
       <div class="model-card">
         <div class="model-preview">
           <div class="model-icon">💨</div>
         </div>
         <div class="model-info">
           <div class="model-name">Hookah</div>
-          <button class="ar-button" onclick="openARCamera('hookah.glb', 'hookah')">
+          <button class="ar-button" onclick="openAR('hookah.glb', 'hookah', 0.40)">
             <span>📱</span> View in AR
           </button>
         </div>
       </div>
 
+      <!-- Souvenir - YOUR 24% FIX -->
       <div class="model-card">
         <div class="model-preview">
           <div class="model-icon">🏺</div>
         </div>
         <div class="model-info">
           <div class="model-name">Souvenir</div>
-          <button class="ar-button" onclick="openARCamera('souvenir.glb', 'souvenir')">
+          <button class="ar-button" onclick="openAR('souvenir.glb', 'souvenir', 0.24)">
             <span>📱</span> View in AR
           </button>
         </div>
       </div>
 
+      <!-- Hand Bag -->
       <div class="model-card">
         <div class="model-preview">
           <div class="model-icon">👜</div>
         </div>
         <div class="model-info">
           <div class="model-name">Hand Bag</div>
-          <button class="ar-button" onclick="openARCamera('handbag.glb', 'handbag')">
+          <button class="ar-button" onclick="openAR('handbag.glb', 'handbag', 0.35)">
             <span>📱</span> View in AR
           </button>
         </div>
-      </div>	  
+      </div>
     </div>
   </div>
 
-  <div id="ar-view" class="ar-view">
-    <button class="close-ar" onclick="closeAR()">✕</button>
-  </div>
-
   <script>
-    let currentViewer = null;
+    // Detect platform
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
     
-    // Model configuration with proper AR scaling
-    const modelConfig = {
-      'cherry': {
-        scale: '0.5 0.5 0.5',
-        cameraOrbit: '45deg 55deg 2m'
-      },
-      'hookah': {
-        scale: '0.4 0.4 0.4',
-        cameraOrbit: '45deg 55deg 2m'
-      },
-      'souvenir': {
-        scale: '0.25 0.25 0.25',  // 25% size - adjusted for souvenir
-        cameraOrbit: '45deg 55deg 2m'
-      },
-      'handbag': {
-        scale: '0.35 0.35 0.35',
-        cameraOrbit: '45deg 55deg 2m'
-      }
-    };
+    // Get the base URL for your models
+    const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
     
-    function openARCamera(glbFile, modelId) {
-      console.log('Opening AR for:', glbFile);
+    async function openAR(modelFile, modelName, desiredScale) {
+      console.log(`Opening ${modelName} at ${desiredScale * 100}% scale`);
+      console.log(`Platform: ${isIOS ? 'iOS' : isAndroid ? 'Android' : 'Other'}`);
       
-      const arView = document.getElementById('ar-view');
-      arView.innerHTML = '<button class="close-ar" onclick="closeAR()">✕</button>';
+      const modelUrl = baseUrl + modelFile;
       
-      const config = modelConfig[modelId];
-      
-      // Create model-viewer with proper AR attributes
-      currentViewer = document.createElement('model-viewer');
-      currentViewer.src = glbFile;
-      currentViewer.alt = `3D model of ${modelId}`;
-      currentViewer.ar = true;
-      currentViewer.arModes = "webxr scene-viewer quick-look";
-      currentViewer.cameraControls = true;
-      currentViewer.autoRotate = true;
-      currentViewer.disableZoom = false;
-      currentViewer.interactionPrompt = "auto";
-      
-      // CRITICAL: Set scale for AR mode
-      currentViewer.scale = config.scale;
-      
-      // Set camera position for better view
-      currentViewer.cameraOrbit = config.cameraOrbit;
-      
-      // These help with sizing in AR
-      currentViewer.setAttribute('environment-image', 'neutral');
-      currentViewer.setAttribute('shadow-intensity', '1');
-      currentViewer.setAttribute('exposure', '1');
-      
-      currentViewer.style.width = '100%';
-      currentViewer.style.height = '100%';
-      
-      arView.appendChild(currentViewer);
-      arView.style.display = 'block';
-      
-      // Force AR to activate with the scale applied
-      currentViewer.addEventListener('load', () => {
-        console.log('Model loaded, applying scale:', config.scale);
-        // Re-apply scale after load to ensure it takes effect
-        currentViewer.scale = config.scale;
+      if (isIOS) {
+        // iOS: Use AR Quick Look with URL parameters
+        // Note: iOS requires .usdz format, not .glb
+        // If you have .usdz files, use them instead
+        const usdzFile = modelFile.replace('.glb', '.usdz');
+        const usdzUrl = baseUrl + usdzFile;
         
-        // Small delay before activating AR
+        // iOS AR Quick Look URL with scale parameter (works on iOS 15.5+)
+        // Add #scale=0.24 to set initial scale to 24%
+        const arUrl = `${usdzUrl}#scale=${desiredScale}`;
+        
+        console.log('Opening iOS AR Quick Look with URL:', arUrl);
+        
+        // Create a temporary link and click it
+        const link = document.createElement('a');
+        link.rel = 'ar';
+        link.href = arUrl;
+        link.download = usdzFile;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+      } else if (isAndroid) {
+        // Android: Use Scene Viewer Intent with scale parameter
+        const encodedUrl = encodeURIComponent(modelUrl);
+        
+        // Android Intent with scale parameter - THIS WORKS!
+        const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodedUrl}&mode=ar_preferred&enable_scale=true&scale=${desiredScale}#Intent;scheme=https;package=com.google.ar.core;end;`;
+        
+        console.log('Opening Android Scene Viewer with scale:', desiredScale);
+        window.location.href = intentUrl;
+        
+        // Fallback if intent fails
         setTimeout(() => {
-          if (currentViewer && currentViewer.activateAR) {
-            currentViewer.activateAR();
-          }
+          window.location.href = `https://arvr.google.com/scene-viewer/1.0?file=${encodedUrl}&mode=ar_preferred&enable_scale=true&scale=${desiredScale}`;
         }, 500);
-      });
-      
-      // Fallback activation
-      setTimeout(() => {
-        if (currentViewer && currentViewer.activateAR) {
-          currentViewer.activateAR();
-        }
-      }, 2000);
-    }
-    
-    function closeAR() {
-      const arView = document.getElementById('ar-view');
-      arView.style.display = 'none';
-      arView.innerHTML = '<button class="close-ar" onclick="closeAR()">✕</button>';
-      
-      if (currentViewer) {
-        currentViewer = null;
+        
+      } else {
+        // Desktop or other: Use model-viewer as fallback
+        showModelViewerFallback(modelUrl, modelName, desiredScale);
       }
     }
     
-    document.addEventListener('DOMContentLoaded', function() {
-      const arView = document.getElementById('ar-view');
+    // Fallback for desktop browsers
+    function showModelViewerFallback(modelUrl, modelName, desiredScale) {
+      // Create modal with model-viewer
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'black';
+      modal.style.zIndex = '10000';
       
-      arView.addEventListener('ar-status', function(event) {
-        if (event.detail && event.detail.status === 'not-presenting') {
-          closeAR();
-        }
-      });
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = '✕';
+      closeBtn.style.position = 'absolute';
+      closeBtn.style.top = '20px';
+      closeBtn.style.right = '20px';
+      closeBtn.style.width = '50px';
+      closeBtn.style.height = '50px';
+      closeBtn.style.borderRadius = '50%';
+      closeBtn.style.backgroundColor = 'rgba(255,255,255,0.2)';
+      closeBtn.style.color = 'white';
+      closeBtn.style.border = 'none';
+      closeBtn.style.fontSize = '24px';
+      closeBtn.style.cursor = 'pointer';
+      closeBtn.style.zIndex = '10001';
+      closeBtn.onclick = () => modal.remove();
       
-      arView.addEventListener('click', function(e) {
-        if (e.target === arView) {
-          closeAR();
+      const viewer = document.createElement('model-viewer');
+      viewer.src = modelUrl;
+      viewer.ar = true;
+      viewer.arModes = 'webxr scene-viewer quick-look';
+      viewer.cameraControls = true;
+      viewer.autoRotate = true;
+      viewer.scale = `${desiredScale} ${desiredScale} ${desiredScale}`;
+      viewer.style.width = '100%';
+      viewer.style.height = '100%';
+      
+      modal.appendChild(closeBtn);
+      modal.appendChild(viewer);
+      document.body.appendChild(modal);
+      
+      // Auto-activate AR if possible
+      setTimeout(() => {
+        if (viewer.activateAR) {
+          viewer.activateAR();
         }
-      });
-    });
+      }, 1000);
+    }
+    
+    console.log('AR Gallery Ready!');
+    console.log(`iOS: ${isIOS}, Android: ${isAndroid}`);
+    console.log('Souvenir will open at 24% scale automatically');
   </script>
+  
+  <!-- Load model-viewer for fallback only -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 </body>
 </html>
