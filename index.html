@@ -237,6 +237,20 @@
         </div>
       </div>	  
     </div>
+	
+	<!-- Model 5 -->
+      <div class="model-card">
+        <div class="model-preview">
+          <div class="model-icon">🧊</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">Pizza</div>
+          <button class="ar-button" onclick="openARCamera('pizza.glb', 'pizza')">
+            <span>📱</span> View in AR
+          </button>
+        </div>
+      </div>	  
+    </div>
   </div>
 
   <!-- AR View - Hidden by default -->
@@ -265,6 +279,11 @@
         fieldOfView: '30deg'
       },
       'handbag': {
+        scale: '0.15 0.15 0.15',     // 15% scale
+        cameraOrbit: '45deg 55deg 1.5m',
+        fieldOfView: '30deg'
+      }
+	  'pizza': {
         scale: '0.15 0.15 0.15',     // 15% scale
         cameraOrbit: '45deg 55deg 1.5m',
         fieldOfView: '30deg'
